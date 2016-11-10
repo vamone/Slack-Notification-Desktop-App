@@ -1,5 +1,7 @@
 ﻿using System;
-using SlackNotificationService;
+
+using Slack;
+using Slack.Intelligence;
 
 namespace SlackDesktopBubbleApplication
 {

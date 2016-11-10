@@ -27,14 +27,14 @@ namespace SlackDesktopBubbleApplication
             bool isInitilized = window.IsSlackInitialized();
             if (isInitilized)
             {
-                window.NotificationArea.Children.Clear();
-
                 window.Initilize();
 
-                window.UnSetColorsOnSlackSharpIcon();
+                window.NotificationArea.Children.Clear();
 
                 window.ThreadGetMessageInBackground.Start();
                 window.ClearNotificationAreaTimer.Start();
+
+                window.UnSetColorsOnSlackSharpIcon();
 
                 this.Close();
             }

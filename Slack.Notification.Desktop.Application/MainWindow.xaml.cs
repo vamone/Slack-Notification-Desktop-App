@@ -7,7 +7,9 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-using SlackNotificationService;
+using Slack;
+using Slack.Intelligence;
+using Slack.Notification.Service;
 
 namespace SlackDesktopBubbleApplication
 {
@@ -31,50 +33,6 @@ namespace SlackDesktopBubbleApplication
             this.Initilize();
         }
 
-        internal static void ClearChildren(StackPanel stackPanel, int index)
-        {
-            stackPanel.Children.RemoveAt(index);
-        }
-
-        internal void AddChildren(StackPanel stackPanel, Message message)
-        {
-            this.SetColorsOnSlackSharpIcon();
-
-            var notification = NotificationAreaFactory.BuildNotification(message.MessageText,
-                message.Timestamp,
-                message.UserName,
-                message.ChannelName);
-
-            stackPanel.Children.Add(notification);
-        }
-
-        internal void GetAndDisplayMessages(Func<Message, Action> action)
-        {
-            var messages = this.IsTestMode ? MockMessages.GetMockMessages() : this.GetMessagesContinuouslyInternal();
-
-            foreach (var message in messages)
-            {
-                action.Invoke(message);
-            }
-        }
-
-        internal IEnumerable<Message> GetMessagesContinuouslyInternal()
-        {
-            var messages = Slack.GetMessages();
-
-            foreach (var message in messages)
-            {
-                yield return message;
-            }
-
-            var nextMessages = GetMessagesContinuouslyInternal();
-
-            foreach (var message in nextMessages)
-            {
-                yield return message;
-            }
-        }
-
         internal void Initilize()
         {
             try
@@ -82,7 +40,7 @@ namespace SlackDesktopBubbleApplication
                 //this.IsTestMode = true;
 
                 AddMessageAction =
-                    (m) => (Action) Dispatcher.Invoke(DispatcherPriority.Normal,
+                    (m) => (Action)Dispatcher.Invoke(DispatcherPriority.Normal,
                         new Action<StackPanel>(x => this.AddChildren(x, m)),
                         this.NotificationArea);
 
@@ -117,6 +75,50 @@ namespace SlackDesktopBubbleApplication
             }
         }
 
+        internal static void ClearChildren(StackPanel stackPanel, int index)
+        {
+            stackPanel.Children.RemoveAt(index);
+        }
+
+        internal void AddChildren(StackPanel stackPanel, Message message)
+        {
+            this.SetColorsOnSlackSharpIcon();
+
+            var notification = NotificationAreaFactory.BuildNotification(message.MessageText,
+                message.Timestamp,
+                message.UserName,
+                message.ChannelName);
+
+            stackPanel.Children.Add(notification);
+        }
+
+        internal void GetAndDisplayMessages(Func<Message, Action> action)
+        {
+            var messages = this.IsTestMode ? MockMessages.GetMockMessages() : GetMessagesContinuouslyInternal();
+
+            foreach (var message in messages)
+            {
+                action.Invoke(message);
+            }
+        }
+
+        internal IEnumerable<Message> GetMessagesContinuouslyInternal()
+        {
+            var messages = Slack.GetMessages();
+
+            foreach (var message in messages)
+            {
+                yield return message;
+            }
+
+            var nextMessages = GetMessagesContinuouslyInternal();
+
+            foreach (var message in nextMessages)
+            {
+                yield return message;
+            }
+        }
+
         internal bool IsSlackInitialized()
         {
             string token = RegistryUtility.Read("MyToken");
@@ -129,7 +131,7 @@ namespace SlackDesktopBubbleApplication
                 this.HasInitializationError = true;
 
                 string messageText =
-                    $"Error: {components.Result.Message}\nSolution: {components.Result.ResponseError.SolutionMessage}";
+                    $"Error: {components.Result.Message}\nSolution: {components.ResponseError.SolutionMessage}";
 
                 MessageHelper.AddMessage(this.AddMessageAction, messageText, "system");
 
