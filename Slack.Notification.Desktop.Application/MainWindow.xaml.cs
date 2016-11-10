@@ -23,22 +23,18 @@ namespace SlackDesktopBubbleApplication
 
         private Func<Message, Action> AddMessageAction;
 
-        private bool HasInitializationError = false;
-
-        private bool IsTestMode = false;
+        private bool IsTestMode = true;
 
         public MainWindow()
         {
             this.InitializeComponent();
-            this.Initilize();
+            this.InitilizeBubbleApplication();
         }
 
-        internal void Initilize()
+        internal void InitilizeBubbleApplication()
         {
             try
             {
-                //this.IsTestMode = true;
-
                 AddMessageAction =
                     (m) => (Action)Dispatcher.Invoke(DispatcherPriority.Normal,
                         new Action<StackPanel>(x => this.AddChildren(x, m)),
@@ -58,12 +54,9 @@ namespace SlackDesktopBubbleApplication
 
                 this.ThreadGetMessageInBackground = new Thread(() => this.GetAndDisplayMessages(this.AddMessageAction));
 
-                if (!this.IsTestMode)
-                {
-                    this.ClearNotificationAreaTimer = new DispatcherTimer();
-                    this.ClearNotificationAreaTimer.Tick += ClearNotificationsTimerEventProcessor;
-                    this.ClearNotificationAreaTimer.Interval = new TimeSpan(0, 0, 5);
-                }
+                this.ClearNotificationAreaTimer = new DispatcherTimer();
+                this.ClearNotificationAreaTimer.Tick += ClearNotificationsTimerEventProcessor;
+                this.ClearNotificationAreaTimer.Interval = new TimeSpan(0, 0, 5);
             }
             catch (Exception ex)
             {
@@ -75,21 +68,27 @@ namespace SlackDesktopBubbleApplication
             }
         }
 
-        internal static void ClearChildren(StackPanel stackPanel, int index)
-        {
-            stackPanel.Children.RemoveAt(index);
-        }
-
-        internal void AddChildren(StackPanel stackPanel, Message message)
+        internal void AddChildren(StackPanel stackPanelNotificationArea, Message message)
         {
             this.SetColorsOnSlackSharpIcon();
+
+            var elements = stackPanelNotificationArea.Children.Cast<Border>();
+
+            double totaltHeightElements = elements.Select(x => x.ActualHeight).Sum();
+
+            if (totaltHeightElements > 200)
+            {
+                var lastElement = elements.FirstOrDefault();
+
+                stackPanelNotificationArea.Children.Remove(lastElement);
+            }
 
             var notification = NotificationAreaFactory.BuildNotification(message.MessageText,
                 message.Timestamp,
                 message.UserName,
                 message.ChannelName);
 
-            stackPanel.Children.Add(notification);
+            stackPanelNotificationArea.Children.Add(notification);
         }
 
         internal void GetAndDisplayMessages(Func<Message, Action> action)
@@ -128,8 +127,6 @@ namespace SlackDesktopBubbleApplication
             bool hasInitSuccess = components.Result.IsSuccess;
             if (!hasInitSuccess)
             {
-                this.HasInitializationError = true;
-
                 string messageText =
                     $"Error: {components.Result.Message}\nSolution: {components.ResponseError.SolutionMessage}";
 
@@ -169,8 +166,6 @@ namespace SlackDesktopBubbleApplication
 
         private void ClearNotificationsTimerEventProcessor(object sender, EventArgs e)
         {
-            int i = 0;
-
             var elements =
                 this.NotificationArea.Children.Cast<object>()
                     .Select(x => x as FrameworkElement)
@@ -192,10 +187,8 @@ namespace SlackDesktopBubbleApplication
                         element.Margin = new Thickness {Left = value};
                     }
 
-                    this.NotificationArea.Children.RemoveAt(i);
+                    this.NotificationArea.Children.Remove(element);
                 }
-
-                i++;
             }
 
             if (!elements.Any())
@@ -216,7 +209,7 @@ namespace SlackDesktopBubbleApplication
                 Thread.Sleep(3000);
 
                 Dispatcher.Invoke(DispatcherPriority.Normal,
-                    new Action<StackPanel>(x => this.SetVisibilityHidden(x)),
+                    new Action<StackPanel>(this.SetVisibilityHidden),
                     this.StackPanelControlls);
 
             });
@@ -252,23 +245,10 @@ namespace SlackDesktopBubbleApplication
             {
                 DragMove();
             }
-            else if (e.RightButton == MouseButtonState.Pressed)
-            {
-
-            }
-
-            if (e.ChangedButton == MouseButton.Left)
-            {
-                if (e.ClickCount >= 2)
-                {
-
-                }
-            }
         }
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
         {
-            //TODO:
         }
 
         private void SetVisibilityHidden(StackPanel stackPanel)

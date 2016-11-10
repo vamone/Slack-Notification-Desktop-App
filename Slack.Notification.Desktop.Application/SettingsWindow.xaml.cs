@@ -27,7 +27,7 @@ namespace SlackDesktopBubbleApplication
             bool isInitilized = window.IsSlackInitialized();
             if (isInitilized)
             {
-                window.Initilize();
+                window.InitilizeBubbleApplication();
 
                 window.NotificationArea.Children.Clear();
 
