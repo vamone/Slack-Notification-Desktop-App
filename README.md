@@ -1,4 +1,4 @@
-[Logotype](http://bubbles.monych.se/bubble-application-name.png)
+![Logotype](http://bubbles.monych.se/bubble-application-name.png)
 
 ## Follow development process on Trello
 
