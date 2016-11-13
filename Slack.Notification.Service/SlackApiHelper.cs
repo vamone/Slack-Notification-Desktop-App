@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
+
+using Slack.Intelligence;
 
 namespace Slack.Notification.Service
 {
     public class SlackApiHelper : SlackApiHelperBase
     {
-        public InitializationResult InitializeComponents(string token)
+        public InitializationResult Initialize(string token)
         {
-            var components = new InitializationResult();
+            var init = new InitializationResult();
 
             try
             {
@@ -41,45 +42,39 @@ namespace Slack.Notification.Service
                     var responseError =
                         AuthResponseError.GetErrorsAndWarnings.SingleOrDefault(x => x.ErrorCode.Equals(errorCode));
 
-                    components.Result.Message = responseError != null
+                    init.Result.Message = responseError != null
                         ? responseError.Description
                         : content.Error;
 
-                    components.ResponseError = responseError;
+                    init.ResponseError = responseError;
 
-                    return components;
+                    return init;
                 }
 
                 this.UserId = content.UserId;
-
                 this.Token = token;
 
-                var channels = this.GetChannels();
-                var ims = this.GetIms();
                 var users = this.GetUsers();
-                var bots = this.GetBots();
-                var emojis = this.GetEmojis();
 
-                this.Channels = channels;
-                this.Ims = ims;
-                this.Users = users;
-                this.Bots = bots;
-                this.Emojis = emojis;
+                this.MyPofile = UserMethods.GetMyProfile(users, this.UserId);
 
-                components.Components.Channels = channels;
-                components.Components.Ims = ims;
-                components.Components.Users = users;
-                components.Components.Bots = bots;
-                components.Components.Emojis = emojis;
+                this.Components.Channels = this.GetChannels();
+                this.Components.Ims = this.GetIms();
+                this.Components.Users = users;
+                this.Components.Bots = this.GetBots();
+                this.Components.Emojis = this.GetEmojis();
             }
             catch (Exception ex)
             {
-                components.Result.Message = ex.Message;
+                init.Result.Message = ex.Message;
+                init.Result.IsSuccess = false;
+
+                return init;
             }
 
-            components.Result.IsSuccess = true;
+            init.Result.IsSuccess = true;
 
-            return components;
+            return init;
         }
     }
 }

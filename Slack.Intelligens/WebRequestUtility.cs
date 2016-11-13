@@ -7,32 +7,21 @@ namespace Slack.Intelligence
 {
     public static class WebRequestUtility
     {
-        public static WebRequestResult GetContent(
+        public static string GetContent(
             string url,
             Encoding encoding = null)
         {
-            var content = new WebRequestResult();
-
-            try
+            if (url == null)
             {
-                if (url == null)
-                {
-                    throw new ArgumentNullException(nameof(url));
-                }
-
-                if (string.IsNullOrWhiteSpace(url))
-                {
-                    throw new ArgumentException(nameof(url));
-                }
-
-                content.Content = GetHttpResponseContent(url, encoding);
-                content.IsSuccess = true;
+                throw new ArgumentNullException(nameof(url));
             }
-            catch (Exception ex)
+
+            if (string.IsNullOrWhiteSpace(url))
             {
-                content.ErrorMessage = ex.Message;
-                content.Exception = ex;
+                throw new ArgumentException(nameof(url));
             }
+
+            string content = GetHttpResponseContent(url, encoding);
 
             return content;
         }

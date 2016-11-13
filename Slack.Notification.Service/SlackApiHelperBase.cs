@@ -18,24 +18,20 @@ namespace Slack.Notification.Service
 
         public SlackApiHelperBase()
         {
+            this.Components = this.Components ?? new Components();
+
             this.LastMessageAt = DateTime.Now;
         }
 
-        internal ICollection<Bot> Bots { get; set; }
+        public Components Components { get; protected set; }
 
-        internal ICollection<Channel> Channels { get; set; }
-
-        internal ICollection<Emoji> Emojis { get; set; }
-
-        internal ICollection<Im> Ims { get; set; }
-
-        internal ICollection<User> Users { get; set; }
+        public User MyPofile { get; protected set; }
 
         public ICollection<Message> GetMessages() //TODO: MAKE IT GENRIC TYPE
         {
             var messages = new List<Message>();
 
-            foreach (var channel in this.Channels)
+            foreach (var channel in this.Components.Channels)
             {
                 var url = string.Format(RequestConfig.ChannelsHistoryUrl, this.Token, channel.ChannelId,
                     RequestConfig.TakeMessageByRequest);
@@ -46,7 +42,7 @@ namespace Slack.Notification.Service
                 messages.AddRange(messagesInternal);
             }
 
-            foreach (var im in this.Ims)
+            foreach (var im in this.Components.Ims)
             {
                 var url = string.Format(RequestConfig.ImHistoryUrl, this.Token, im.ImId,
                     RequestConfig.TakeMessageByRequest);
@@ -86,36 +82,36 @@ namespace Slack.Notification.Service
             bool isPrivateMessage = false,
             bool isGroupMessage = false)
         {
-            string userName = UserMethods.GetUserName(this.Users, message.UserId);
+            string userName = UserMethods.GetUserName(this.Components.Users, message.UserId);
             if (userName == null)
             {
-                this.Users = GetUsers();
+                this.Components.Users = GetUsers();
 
-                userName = UserMethods.GetUserName(this.Users, message.UserId);
+                userName = UserMethods.GetUserName(this.Components.Users, message.UserId);
             }
 
-            string botName = BotMethods.GetBotName(this.Bots, message.BotId);
+            string botName = BotMethods.GetBotName(this.Components.Bots, message.BotId);
             if (botName == null)
             {
-                this.Bots = GetBots();
+                this.Components.Bots = GetBots();
 
-                botName = BotMethods.GetBotName(this.Bots, message.BotId);
+                botName = BotMethods.GetBotName(this.Components.Bots, message.BotId);
             }
 
-            string imName = ImMethos.GetImName(this.Ims, this.Users, imId);
+            string imName = ImMethos.GetImName(this.Components.Ims, this.Components.Users, imId);
             if (imName == null)
             {
-                this.Ims = GetIms();
+                this.Components.Ims = GetIms();
 
-                imName = ImMethos.GetImName(this.Ims, this.Users, imId);
+                imName = ImMethos.GetImName(this.Components.Ims, this.Components.Users, imId);
             }
 
-            string channelName = ChannelMethods.GetChannelName(this.Channels, channelId);
+            string channelName = ChannelMethods.GetChannelName(this.Components.Channels, channelId);
             if (channelName == null)
             {
-                this.Channels = GetChannels();
+                this.Components.Channels = GetChannels();
 
-                channelName = ChannelMethods.GetChannelName(this.Channels, channelId);
+                channelName = ChannelMethods.GetChannelName(this.Components.Channels, channelId);
             }
 
             message.UserName = botName ?? userName;
@@ -166,13 +162,7 @@ namespace Slack.Notification.Service
                 throw new SlackApiHelpereException(nameof(content));
             }
 
-            bool isSuccess = content.IsSuccess;
-            if (!isSuccess)
-            {
-                throw new SlackApiHelpereException(content.ErrorMessage);
-            }
-
-            return content.Content;
+            return content;
         }
 
         internal ICollection<Emoji> GetEmojis()

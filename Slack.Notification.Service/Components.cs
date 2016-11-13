@@ -2,9 +2,9 @@
 
 namespace Slack.Notification.Service
 {
-    public class InitializationComponents
+    public class Components
     {
-        public InitializationComponents()
+        public Components()
         {
             this.Bots = this.Bots ?? new List<Bot>();
             this.Channels = this.Channels ?? new List<Channel>();

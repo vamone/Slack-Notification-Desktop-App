@@ -18,7 +18,7 @@ namespace Slack.Notification.Console.Application
             {
                 string token = RegistryUtility.Read("MyToken");
 
-                var conponents = Slack.InitializeComponents(token);
+                var conponents = Slack.Initialize(token);
                 if (conponents == null)
                 {
                     throw new ArgumentNullException(nameof(conponents));

@@ -20,7 +20,7 @@ namespace Slack.Intelligence
 
             string path = Path.Combine(debugFolder, "logs", $"{DateTime.Today:yyyy-MM-dd}.txt");
 
-            string error = $"{DateTime.Now} | {ex.Message} | {ex.StackTrace}{Environment.NewLine}";
+            string error = $"{DateTime.Now} | {ex?.Message} | {ex?.StackTrace}{Environment.NewLine}";
 
             File.AppendAllText(path, error);
         }

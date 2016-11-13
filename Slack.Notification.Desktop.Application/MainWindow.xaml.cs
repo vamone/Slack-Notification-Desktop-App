@@ -16,26 +16,22 @@ namespace SlackDesktopBubbleApplication
     {
         internal DispatcherTimer ClearNotificationAreaTimer;
 
-        internal Thread ThreadGetMessageInBackground;
-
         static readonly Lazy<SlackApiHelper> SlackLazy = new Lazy<SlackApiHelper>();
 
         static SlackApiHelper Slack => SlackLazy.Value;
 
         private Func<Message, Action> AddOrRemoveMessages;
 
+        private bool HasAnyExceptions = false;
+
         private bool IsTestMode = false;
 
         public MainWindow()
         {
             this.InitializeComponent();
-            this.InitilizeBubbleApplication();
-        }
 
-        internal void InitilizeBubbleApplication()
-        {
             AddOrRemoveMessages =
-                (m) => (Action) Dispatcher.Invoke(DispatcherPriority.Normal,
+                (m) => (Action)Dispatcher.Invoke(DispatcherPriority.Normal,
                     new Action<StackPanel>(x => this.AddOrRemoveChildren(x, m)),
                     this.NotificationArea);
 
@@ -44,8 +40,6 @@ namespace SlackDesktopBubbleApplication
 
             this.MainIconArea.MouseDown += OnMouseDown;
             this.MainIconArea.MouseLeave += OnMouseLeave;
-
-            this.ThreadGetMessageInBackground = new Thread(() => this.GetAndDisplayMessages(this.AddOrRemoveMessages));
 
             this.ClearNotificationAreaTimer = new DispatcherTimer();
             this.ClearNotificationAreaTimer.Tick += ClearNotificationsTimerEventProcessor;
@@ -77,24 +71,31 @@ namespace SlackDesktopBubbleApplication
 
         internal void GetAndDisplayMessages(Func<Message, Action> action)
         {
-            try
+            while (true) //TODO: STACKOVERFLOW EXCEPTION ACCURS BY USING SAME METHOD AGAIN
             {
-                var messages = this.IsTestMode ? MockMessages.GetMockMessages() : Slack.GetMessages();
-
-                foreach (var message in messages)
+                try
                 {
-                    action.Invoke(message);
-                }
-            }
-            catch (Exception ex)
-            {
-                ExceptionLogging.Trace(ex);
+                    var messages = this.IsTestMode ? MockMessages.GetMockMessages() : Slack.GetMessages();
 
-                MessageHelper.AddMessage(action, $"Error: {ex.Message}", "system");
-            }
-            finally
-            {
-                this.GetAndDisplayMessages(action);
+                    foreach (var message in messages)
+                    {
+                        action.Invoke(message);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (!this.HasAnyExceptions)
+                    {
+                        MessageHelper.AddMessage(action,
+                            $"Error: {ex.Message}", "system");
+
+                        ExceptionLogging.Trace(ex);
+                    }
+
+                    this.HasAnyExceptions = true;
+
+                    this.ClearNotificationAreaTimer.Stop();
+                }
             }
         }
 
@@ -102,13 +103,13 @@ namespace SlackDesktopBubbleApplication
         {
             string token = RegistryUtility.Read("MyToken");
 
-            var components = Slack.InitializeComponents(token);
+            var init = Slack.Initialize(token);
 
-            bool hasInitSuccess = components.Result.IsSuccess;
+            bool hasInitSuccess = init.Result.IsSuccess;
             if (!hasInitSuccess)
             {
                 string messageText =
-                    $"Error: {components.Result.Message}\nSolution: {components.ResponseError.SolutionMessage}";
+                    $"Error: {init.Result.Message}\nSolution: {init.ResponseError.SolutionMessage}";
 
                 MessageHelper.AddMessage(this.AddOrRemoveMessages, messageText, "system");
 
@@ -143,6 +144,30 @@ namespace SlackDesktopBubbleApplication
             this.SlackLineBlue.Background = SolidColorBrushUtility.AliceBlue;
             this.SlackLineRed.Background = SolidColorBrushUtility.AliceBlue;
         }
+
+        //internal void SetWarningColorsOnSlackSharpIcon()
+        //{
+        //    var thread = new Thread(() =>
+        //    {
+        //        Dispatcher.Invoke(DispatcherPriority.Normal,
+        //            new Action<Border>(this.SetCCC),
+        //            this.SlackLineBlue);
+        //    });
+
+        //    thread.Start();
+        //}
+
+        //internal void SetCCC(Border slackSharpIcon)
+        //{
+        //    while (true)
+        //    {
+        //        slackSharpIcon.Background = SolidColorBrushUtility.SlackRed;
+        //        Thread.Sleep(300);
+
+        //        slackSharpIcon.Background = SolidColorBrushUtility.SlackDarkBlue;
+        //        Thread.Sleep(300);
+        //    }
+        //}
 
         private void ClearNotificationsTimerEventProcessor(object sender, EventArgs e)
         {
@@ -191,7 +216,6 @@ namespace SlackDesktopBubbleApplication
                 Dispatcher.Invoke(DispatcherPriority.Normal,
                     new Action<StackPanel>(this.SetVisibilityHidden),
                     this.StackPanelControlls);
-
             });
 
             thread.Start();
@@ -225,6 +249,23 @@ namespace SlackDesktopBubbleApplication
             {
                 DragMove();
             }
+
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                MessageHelper.AddMessage(this.AddOrRemoveMessages, $"You are logged in as: @{Slack.MyPofile.UserName}", "system");
+            }
+
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                if (e.ClickCount >= 2)
+                {
+                    this.HasAnyExceptions = false;
+
+                    MessageHelper.AddMessage(this.AddOrRemoveMessages, "Bubble has been restarted.", "system");
+
+                    this.ClearNotificationAreaTimer.Start();
+                }
+            }
         }
 
         private void OnMouseLeave(object sender, MouseEventArgs e)
@@ -246,14 +287,16 @@ namespace SlackDesktopBubbleApplication
                     return;
                 }
 
-                this.ThreadGetMessageInBackground?.Start();
+                var thread = new Thread(() => this.GetAndDisplayMessages(this.AddOrRemoveMessages));
+                thread.Start();
+
                 this.ClearNotificationAreaTimer?.Start();
             }
             catch (Exception ex)
             {
                 ExceptionLogging.Trace(ex);
 
-                MessageBox.Show(ex.Message, "Error");
+                MessageHelper.AddMessage(this.AddOrRemoveMessages, $"Error: {ex.Message}", "system");
             }
             finally
             {

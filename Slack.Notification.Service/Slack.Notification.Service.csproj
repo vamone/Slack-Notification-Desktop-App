@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthResponseError.cs" />
-    <Compile Include="InitializationComponents.cs" />
+    <Compile Include="Components.cs" />
     <Compile Include="InitializationResult.cs" />
     <Compile Include="InitializationStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
