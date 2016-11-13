@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Slack.Notification.Service
 {
@@ -12,6 +13,7 @@ namespace Slack.Notification.Service
             try
             {
                 string url = string.Format(RequestConfig.AuthTestUrl, token);
+
                 string json = this.GetContent(url);
 
                 if (json == null)

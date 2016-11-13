@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace Slack.Intelligens
+namespace Slack.Intelligence
 {
     public static class ExceptionLogging
     {

@@ -126,3 +126,13 @@ packages/Newtonsoft.Json.9.0.1/lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft
 packages/Newtonsoft.Json.9.0.1/lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.xml
 packages/Newtonsoft.Json.9.0.1/lib/portable-net45+wp80+win8+wpa81/Newtonsoft.Json.dll
 Slack.Notification.Desktop.Application/bin/Debug/logs/
+Slack.Intelligens/bin/Debug/Slack.Intelligence.dll
+Slack.Intelligens/bin/Debug/Slack.Intelligence.pdb
+Slack.Intelligens/obj/Debug/Slack.Intelligence.dll
+Slack.Intelligens/obj/Debug/Slack.Intelligence.pdb
+Slack.Notification.Console.Application/bin/Debug/Slack.Intelligence.dll
+Slack.Notification.Console.Application/bin/Debug/Slack.Intelligence.pdb
+Slack.Notification.Desktop.Application/bin/Debug/Slack.Intelligence.dll
+Slack.Notification.Desktop.Application/bin/Debug/Slack.Intelligence.pdb
+Slack.Notification.Service/bin/Debug/Slack.Intelligence.dll
+Slack.Notification.Service/bin/Debug/Slack.Intelligence.pdb

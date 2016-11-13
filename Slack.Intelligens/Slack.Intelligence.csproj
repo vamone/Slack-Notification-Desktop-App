@@ -7,8 +7,8 @@
     <ProjectGuid>{EC342735-A58C-4150-A465-C1FC39906305}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Slack.Intelligens</RootNamespace>
-    <AssemblyName>Slack.Intelligens</AssemblyName>
+    <RootNamespace>Slack.Intelligence</RootNamespace>
+    <AssemblyName>Slack.Intelligence</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -48,6 +48,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistryUtility.cs" />
     <Compile Include="UserMethods.cs" />
+    <Compile Include="WebRequestResult.cs" />
     <Compile Include="WebRequestUtility.cs" />
   </ItemGroup>
   <ItemGroup>

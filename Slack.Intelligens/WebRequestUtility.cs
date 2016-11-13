@@ -2,33 +2,42 @@
 using System.IO;
 using System.Net;
 using System.Text;
-using Slack.Intelligens;
 
 namespace Slack.Intelligence
 {
-    public class WebRequestUtility
+    public static class WebRequestUtility
     {
-        public static string GetContent(
+        public static WebRequestResult GetContent(
             string url,
-            string userAgent = null,
             Encoding encoding = null)
         {
-            if (url == null)
+            var content = new WebRequestResult();
+
+            try
             {
-                throw new ArgumentNullException(nameof(url));
+                if (url == null)
+                {
+                    throw new ArgumentNullException(nameof(url));
+                }
+
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    throw new ArgumentException(nameof(url));
+                }
+
+                content.Content = GetHttpResponseContent(url, encoding);
+                content.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                content.ErrorMessage = ex.Message;
+                content.Exception = ex;
             }
 
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                throw new ArgumentException(nameof(url));
-            }
-
-            string webpageContent = GetHttpResponseContent(url, encoding);
-
-            return webpageContent;
+            return content;
         }
 
-        private static string GetHttpResponseContent(
+        internal static string GetHttpResponseContent(
             string url,
             Encoding encoding)
         {
@@ -42,30 +51,20 @@ namespace Slack.Intelligence
             request.ContinueTimeout = timeout;
             request.ReadWriteTimeout = timeout;
 
-            try
+            var response = request.GetResponse();
+
+            using (var data = response.GetResponseStream())
             {
-                var response = request.GetResponse();
-
-                using (var data = response.GetResponseStream())
+                if (data == null)
                 {
-                    if (data == null)
-                    {
-                        return null;
-                    }
+                    return null;
+                }
 
-                    using (var reader = new StreamReader(data, encoding))
-                    {
-                        string content = reader.ReadToEnd();
-                        return content;
-                    }
+                using (var reader = new StreamReader(data, encoding))
+                {
+                    return reader.ReadToEnd();
                 }
             }
-            catch (Exception ex)
-            {
-                ExceptionLogging.Trace(ex);
-            }
-
-            return null;
         }
     }
 }

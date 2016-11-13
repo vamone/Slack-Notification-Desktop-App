@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -9,7 +8,6 @@ using System.Windows.Threading;
 
 using Slack;
 using Slack.Intelligence;
-using Slack.Intelligens;
 using Slack.Notification.Service;
 
 namespace SlackDesktopBubbleApplication
@@ -20,9 +18,11 @@ namespace SlackDesktopBubbleApplication
 
         internal Thread ThreadGetMessageInBackground;
 
-        private static readonly SlackApiHelper Slack = new SlackApiHelper();
+        static readonly Lazy<SlackApiHelper> SlackLazy = new Lazy<SlackApiHelper>();
 
-        private Func<Message, Action> AddMessageAction;
+        static SlackApiHelper Slack => SlackLazy.Value;
+
+        private Func<Message, Action> AddOrRemoveMessages;
 
         private bool IsTestMode = false;
 
@@ -34,48 +34,29 @@ namespace SlackDesktopBubbleApplication
 
         internal void InitilizeBubbleApplication()
         {
-            try
-            {
-                AddMessageAction =
-                    (m) => (Action)Dispatcher.Invoke(DispatcherPriority.Normal,
-                        new Action<StackPanel>(x => this.AddChildren(x, m)),
-                        this.NotificationArea);
+            AddOrRemoveMessages =
+                (m) => (Action) Dispatcher.Invoke(DispatcherPriority.Normal,
+                    new Action<StackPanel>(x => this.AddOrRemoveChildren(x, m)),
+                    this.NotificationArea);
 
-                this.StackPanelControlls.Visibility = Visibility.Hidden;
-                this.GridOpenMessageMenu.Visibility = Visibility.Hidden;
+            this.StackPanelControlls.Visibility = Visibility.Hidden;
+            this.GridOpenMessageMenu.Visibility = Visibility.Hidden;
 
-                this.MainIconArea.MouseDown += OnMouseDown;
-                this.MainIconArea.MouseLeave += OnMouseLeave;
+            this.MainIconArea.MouseDown += OnMouseDown;
+            this.MainIconArea.MouseLeave += OnMouseLeave;
 
-                bool isSlackInitilized = this.IsSlackInitialized();
-                if (!isSlackInitilized)
-                {
-                    return;
-                }
+            this.ThreadGetMessageInBackground = new Thread(() => this.GetAndDisplayMessages(this.AddOrRemoveMessages));
 
-                this.ThreadGetMessageInBackground = new Thread(() => this.GetAndDisplayMessages(this.AddMessageAction));
-
-                this.ClearNotificationAreaTimer = new DispatcherTimer();
-                this.ClearNotificationAreaTimer.Tick += ClearNotificationsTimerEventProcessor;
-                this.ClearNotificationAreaTimer.Interval = new TimeSpan(0, 0, 5);
-            }
-            catch (Exception ex)
-            {
-                ExceptionLogging.Trace(ex);
-
-                MessageBox.Show(ex.Message, "Error");
-            }
-            finally
-            {
-                this.SetInactiveColorsOnSlackShartIcon();
-            }
+            this.ClearNotificationAreaTimer = new DispatcherTimer();
+            this.ClearNotificationAreaTimer.Tick += ClearNotificationsTimerEventProcessor;
+            this.ClearNotificationAreaTimer.Interval = new TimeSpan(0, 0, 5);
         }
 
-        internal void AddChildren(StackPanel stackPanelNotificationArea, Message message)
+        internal void AddOrRemoveChildren(StackPanel stackPanelNotificationArea, Message message)
         {
             this.SetColorsOnSlackSharpIcon();
 
-            var elements = stackPanelNotificationArea.Children.Cast<Border>();
+            var elements = stackPanelNotificationArea.Children.Cast<Border>().ToList();
 
             double totaltHeightElements = elements.Select(x => x.ActualHeight).Sum();
 
@@ -96,28 +77,24 @@ namespace SlackDesktopBubbleApplication
 
         internal void GetAndDisplayMessages(Func<Message, Action> action)
         {
-            var messages = this.IsTestMode ? MockMessages.GetMockMessages() : GetMessagesContinuouslyInternal();
-
-            foreach (var message in messages)
+            try
             {
-                action.Invoke(message);
+                var messages = this.IsTestMode ? MockMessages.GetMockMessages() : Slack.GetMessages();
+
+                foreach (var message in messages)
+                {
+                    action.Invoke(message);
+                }
             }
-        }
-
-        internal IEnumerable<Message> GetMessagesContinuouslyInternal()
-        {
-            var messages = Slack.GetMessages();
-
-            foreach (var message in messages)
+            catch (Exception ex)
             {
-                yield return message;
+                ExceptionLogging.Trace(ex);
+
+                MessageHelper.AddMessage(action, $"Error: {ex.Message}", "system");
             }
-
-            var nextMessages = GetMessagesContinuouslyInternal();
-
-            foreach (var message in nextMessages)
+            finally
             {
-                yield return message;
+                this.GetAndDisplayMessages(action);
             }
         }
 
@@ -133,7 +110,7 @@ namespace SlackDesktopBubbleApplication
                 string messageText =
                     $"Error: {components.Result.Message}\nSolution: {components.ResponseError.SolutionMessage}";
 
-                MessageHelper.AddMessage(this.AddMessageAction, messageText, "system");
+                MessageHelper.AddMessage(this.AddOrRemoveMessages, messageText, "system");
 
                 //TODO: START RED LINE BLINK
 
@@ -259,16 +236,28 @@ namespace SlackDesktopBubbleApplication
             stackPanel.Visibility = Visibility.Hidden;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_ContentRendered(object sender, EventArgs e)
         {
-            if (this.ThreadGetMessageInBackground != null)
+            try
             {
-                this.ThreadGetMessageInBackground.Start();
-            }
+                bool isSlackInitilized = this.IsSlackInitialized();
+                if (!isSlackInitilized)
+                {
+                    return;
+                }
 
-            if (this.ClearNotificationAreaTimer != null)
+                this.ThreadGetMessageInBackground?.Start();
+                this.ClearNotificationAreaTimer?.Start();
+            }
+            catch (Exception ex)
             {
-                this.ClearNotificationAreaTimer.Start();
+                ExceptionLogging.Trace(ex);
+
+                MessageBox.Show(ex.Message, "Error");
+            }
+            finally
+            {
+                this.SetInactiveColorsOnSlackShartIcon();
             }
         }
     }

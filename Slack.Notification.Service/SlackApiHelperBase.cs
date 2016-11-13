@@ -39,6 +39,7 @@ namespace Slack.Notification.Service
             {
                 var url = string.Format(RequestConfig.ChannelsHistoryUrl, this.Token, channel.ChannelId,
                     RequestConfig.TakeMessageByRequest);
+
                 var json = this.GetContent(url);
 
                 var messagesInternal = this.GetMessagesInternal(json, null, channel.ChannelId);
@@ -49,6 +50,7 @@ namespace Slack.Notification.Service
             {
                 var url = string.Format(RequestConfig.ImHistoryUrl, this.Token, im.ImId,
                     RequestConfig.TakeMessageByRequest);
+
                 var json = this.GetContent(url);
 
                 var messagesInternal = this.GetMessagesInternal(json, im.ImId, null, true);
@@ -158,13 +160,19 @@ namespace Slack.Notification.Service
                 throw new ArgumentException(nameof(url));
             }
 
-            var json = WebRequestUtility.GetContent(url);
-            if (json == null)
+            var content = WebRequestUtility.GetContent(url);
+            if (content == null)
             {
-                throw new SlackApiHelpereException(nameof(json));
+                throw new SlackApiHelpereException(nameof(content));
             }
 
-            return json;
+            bool isSuccess = content.IsSuccess;
+            if (!isSuccess)
+            {
+                throw new SlackApiHelpereException(content.ErrorMessage);
+            }
+
+            return content.Content;
         }
 
         internal ICollection<Emoji> GetEmojis()

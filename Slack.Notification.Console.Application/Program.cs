@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Threading;
 
 using Slack.Intelligence;
 using Slack.Notification.Service;
@@ -8,46 +8,54 @@ namespace Slack.Notification.Console.Application
 {
     public class Program
     {
-        private static readonly SlackApiHelper Slack = new SlackApiHelper();
+        static readonly Lazy<SlackApiHelper> SlackLazy = new Lazy<SlackApiHelper>();
+
+        static SlackApiHelper Slack => SlackLazy.Value;
 
         public static void Main(string[] args)
         {
-            string token = RegistryUtility.Read("MyToken");
-
-            var conponents = Slack.InitializeComponents(token);
-
-            System.Console.WriteLine(conponents.Result.Message);
-
             try
             {
-                var messages = GetMessagesInternal(Slack);
-                foreach (var message in messages)
+                string token = RegistryUtility.Read("MyToken");
+
+                var conponents = Slack.InitializeComponents(token);
+                if (conponents == null)
                 {
-                    System.Console.WriteLine($"{message.UserName}#{message.ChannelName}: {message.MessageText}");
+                    throw new ArgumentNullException(nameof(conponents));
                 }
+
+                System.Console.WriteLine(conponents.Result.Message);
+
+                if (!conponents.Result.IsSuccess)
+                {
+                    return;
+                }
+
+                var thread = new Thread(GetMessagesInternal);
+                thread.Start();
             }
             catch (Exception ex)
             {
                 System.Console.WriteLine(ex.Message);
             }
-
-            System.Console.ReadLine();
         }
 
-        internal static IEnumerable<Message> GetMessagesInternal(SlackApiHelper api)
+        private static void GetMessagesInternal()
         {
-            var messages = Slack.GetMessages();
-
-            foreach (var message in messages)
+            try
             {
-                yield return message;
+                var messages = Slack.GetMessages();
+
+                foreach (var message in messages)
+                {
+                    System.Console.WriteLine($"{message.UserName}#{message.ChannelName}: {message.MessageText}");
+                }
+
+                GetMessagesInternal();
             }
-
-            var nextMessages = GetMessagesInternal(api);
-
-            foreach (var message in nextMessages)
+            catch (Exception ex)
             {
-                yield return message;
+                System.Console.WriteLine(ex.Message);
             }
         }
     }
