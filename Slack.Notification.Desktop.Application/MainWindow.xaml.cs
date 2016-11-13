@@ -9,6 +9,7 @@ using System.Windows.Threading;
 
 using Slack;
 using Slack.Intelligence;
+using Slack.Intelligens;
 using Slack.Notification.Service;
 
 namespace SlackDesktopBubbleApplication
@@ -23,7 +24,7 @@ namespace SlackDesktopBubbleApplication
 
         private Func<Message, Action> AddMessageAction;
 
-        private bool IsTestMode = true;
+        private bool IsTestMode = false;
 
         public MainWindow()
         {
@@ -60,6 +61,8 @@ namespace SlackDesktopBubbleApplication
             }
             catch (Exception ex)
             {
+                ExceptionLogging.Trace(ex);
+
                 MessageBox.Show(ex.Message, "Error");
             }
             finally

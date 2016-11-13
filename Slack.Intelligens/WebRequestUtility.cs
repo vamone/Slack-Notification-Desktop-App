@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using Slack.Intelligens;
 
 namespace Slack.Intelligence
 {
@@ -35,27 +36,36 @@ namespace Slack.Intelligence
 
             var request = WebRequest.CreateHttp(url);
 
-            var timeout = (int)TimeSpan.FromSeconds(10).TotalMilliseconds;
+            var timeout = (int) TimeSpan.FromSeconds(10).TotalMilliseconds;
 
             request.Timeout = timeout;
             request.ContinueTimeout = timeout;
             request.ReadWriteTimeout = timeout;
 
-            var response = request.GetResponse();
-
-            using (var data = response.GetResponseStream())
+            try
             {
-                if (data == null)
-                {
-                    return null;
-                }
+                var response = request.GetResponse();
 
-                using (var reader = new StreamReader(data, encoding))
+                using (var data = response.GetResponseStream())
                 {
-                    string content = reader.ReadToEnd();
-                    return content;
+                    if (data == null)
+                    {
+                        return null;
+                    }
+
+                    using (var reader = new StreamReader(data, encoding))
+                    {
+                        string content = reader.ReadToEnd();
+                        return content;
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                ExceptionLogging.Trace(ex);
+            }
+
+            return null;
         }
     }
 }
