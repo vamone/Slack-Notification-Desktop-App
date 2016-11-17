@@ -82,6 +82,20 @@ namespace SlackDesktopBubbleApplication
                         action.Invoke(message);
                     }
                 }
+                catch (SlackApiHelpereException ex)
+                {
+                    if (!this.HasAnyExceptions)
+                    {
+                        MessageHelper.AddMessage(action,
+                            $"Error: {ex.Message}", "system");
+
+                        ExceptionLogging.Trace(ex);
+                    }
+
+                    this.HasAnyExceptions = true;
+
+                    this.ClearNotificationAreaTimer.Stop();
+                }
                 catch (Exception ex)
                 {
                     if (!this.HasAnyExceptions)

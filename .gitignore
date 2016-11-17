@@ -136,3 +136,6 @@ Slack.Notification.Desktop.Application/bin/Debug/Slack.Intelligence.dll
 Slack.Notification.Desktop.Application/bin/Debug/Slack.Intelligence.pdb
 Slack.Notification.Service/bin/Debug/Slack.Intelligence.dll
 Slack.Notification.Service/bin/Debug/Slack.Intelligence.pdb
+Slack.Notification.Desktop.Application/bin/Debug/json/
+Slack.Notification.Console.Application/bin/Debug/json/
+.vs/config/applicationhost.config

@@ -19,6 +19,8 @@ namespace Slack
 
         public string ChannelName { get; set; }
 
+        public  string ChannelId { get; set; }
+
         public bool IsGroupMessage { get; set; }
 
         public bool IsPrivateMessage { get; set; }

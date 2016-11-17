@@ -50,11 +50,12 @@
     <Compile Include="Channel.cs" />
     <Compile Include="ChannelParent.cs" />
     <Compile Include="Emoji.cs" />
+    <Compile Include="EmojiParent.cs" />
     <Compile Include="Im.cs" />
     <Compile Include="ImParent.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="MessageParent.cs" />
-    <Compile Include="PostMessage.cs" />
+    <Compile Include="MessageResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestConfig.cs" />
     <Compile Include="User.cs" />

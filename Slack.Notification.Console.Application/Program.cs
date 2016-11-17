@@ -26,6 +26,9 @@ namespace Slack.Notification.Console.Application
 
                 System.Console.WriteLine(conponents.Result.Message);
 
+                System.Console.WriteLine("Press enter to continuum.");
+                System.Console.ReadLine();
+
                 if (!conponents.Result.IsSuccess)
                 {
                     return;
@@ -33,9 +36,19 @@ namespace Slack.Notification.Console.Application
 
                 var thread = new Thread(GetMessagesInternal);
                 thread.Start();
+
+                var message = new Message
+                {
+                    ChannelId = "general",
+                    MessageText = "Testar om meddelande kommer fram."
+                };
+
+                Slack.SendMessage(message);
             }
             catch (Exception ex)
             {
+                ExceptionLogging.Trace(ex);
+
                 System.Console.WriteLine(ex.Message);
             }
         }
@@ -55,6 +68,8 @@ namespace Slack.Notification.Console.Application
             }
             catch (Exception ex)
             {
+                ExceptionLogging.Trace(ex);
+
                 System.Console.WriteLine(ex.Message);
             }
         }

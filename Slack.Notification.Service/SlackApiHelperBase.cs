@@ -27,6 +27,22 @@ namespace Slack.Notification.Service
 
         public User MyPofile { get; protected set; }
 
+        public void SendMessage(Message message)
+        {
+            string url = string.Format(RequestConfig.SendMessageUrl, this.Token, message.ChannelId ?? message.UserId,
+                message.MessageText);
+
+            string json = this.GetContent(url);
+
+            var content = this.ConvertJsonIntoContent<MessageResponse>(json);
+
+            bool isStatusOk = content.IsStatusOk;
+            if (!isStatusOk)
+            {
+                throw new SlackApiHelpereException(content.Error);
+            }
+        }
+
         public ICollection<Message> GetMessages() //TODO: MAKE IT GENRIC TYPE
         {
             var messages = new List<Message>();
@@ -116,6 +132,7 @@ namespace Slack.Notification.Service
 
             message.UserName = botName ?? userName;
             message.ChannelName = isPrivateMessage ? null : (imName ?? channelName);
+            message.ChannelId = channelId;
 
             message.IsPrivateMessage = isPrivateMessage;
             message.IsGroupMessage = isGroupMessage;
@@ -131,7 +148,10 @@ namespace Slack.Notification.Service
         internal ICollection<Channel> GetChannels()
         {
             var url = string.Format(RequestConfig.ChannelsListUrl, this.Token);
-            var json = this.GetContent(url);
+
+            Func<string> getJson = () => this.GetContent(url);
+
+            string json = JsonUtility.GetJson(getJson, "channels");
 
             var content = this.ConvertJsonIntoContent<ChannelParent>(json);
 
@@ -156,25 +176,47 @@ namespace Slack.Notification.Service
                 throw new ArgumentException(nameof(url));
             }
 
-            var content = WebRequestUtility.GetContent(url);
-            if (content == null)
+            var json = WebRequestUtility.GetContent(url);
+            if (json == null)
             {
-                throw new SlackApiHelpereException(nameof(content));
+                throw new SlackApiHelpereException(nameof(json));
             }
 
-            return content;
+            return json;
         }
 
-        internal ICollection<Emoji> GetEmojis()
+        public static string Base64Encode(string plainText)
         {
-            return new List<Emoji>();
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            return System.Convert.ToBase64String(plainTextBytes);
+        }
+
+        internal ICollection<EmojiParent> GetEmojis()
+        {
+            var url = string.Format(RequestConfig.EmojiUrl, this.Token);
+
+            Func<string> getJson = () => this.GetContent(url);
+
+            string json = JsonUtility.GetJson(getJson, "emoji");
+
+            var content = this.ConvertJsonIntoContent<EmojiParent>(json);
+
+            bool isStatusOk = content.IsStatusOk;
+            if (!isStatusOk)
+            {
+                throw new SlackApiHelpereException(content.Error);
+            }
+
+            return null;
         }
 
         internal ICollection<Im> GetIms()
         {
             var url = string.Format(RequestConfig.ImListUrl, this.Token);
 
-            var json = this.GetContent(url);
+            Func<string> getJson = () => this.GetContent(url);
+
+            string json = JsonUtility.GetJson(getJson, "ims");
 
             var content = this.ConvertJsonIntoContent<ImParent>(json);
 
@@ -208,7 +250,10 @@ namespace Slack.Notification.Service
         internal ICollection<User> GetUsers()
         {
             var url = string.Format(RequestConfig.UserListUrl, this.Token);
-            var json = this.GetContent(url);
+
+            Func<string> getJson = () => this.GetContent(url);
+
+            string json = JsonUtility.GetJson(getJson, "users");
 
             var content = this.ConvertJsonIntoContent<UserParent>(json);
 

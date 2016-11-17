@@ -8,6 +8,6 @@ namespace Slack
 {
     public class Emoji
     {
-        public bool IsStatusOk { get; set; }
+
     }
 }

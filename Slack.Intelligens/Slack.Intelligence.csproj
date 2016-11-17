@@ -45,6 +45,7 @@
     <Compile Include="DateTimeUtility.cs" />
     <Compile Include="ExceptionLogging.cs" />
     <Compile Include="ImMethos.cs" />
+    <Compile Include="JsonUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistryUtility.cs" />
     <Compile Include="UserMethods.cs" />
