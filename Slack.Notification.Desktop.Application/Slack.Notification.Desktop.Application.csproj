@@ -64,7 +64,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MessageHelper.cs" />
-    <Compile Include="MockMessages.cs" />
     <Compile Include="NotificationAreaFactory.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>

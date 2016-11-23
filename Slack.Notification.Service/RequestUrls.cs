@@ -1,6 +1,6 @@
-﻿namespace Slack
+﻿namespace Slack.Notification.Service
 {
-    internal class RequestConfig
+    class RequestUrls
     {
         internal const string ChannelsListUrl = "https://slack.com/api/channels.list?token={0}&pretty=1";
 
@@ -19,5 +19,10 @@
         internal const string UserListUrl = "https://slack.com/api/users.list?token={0}&pretty=1";
 
         internal const string AuthTestUrl = "https://slack.com/api/auth.test?token={0}&pretty=1";
+
+        internal const string SendMessageUrl =
+            "https://slack.com/api/chat.postMessage?token={0}&channel={1}&text={2}&as_user={3}&pretty=1";
+
+        internal const string EmojiUrl = "https://slack.com/api/emoji.list?token={0}&pretty=1";
     }
 }

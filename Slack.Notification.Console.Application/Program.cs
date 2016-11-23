@@ -8,7 +8,7 @@ namespace Slack.Notification.Console.Application
 {
     public class Program
     {
-        static readonly Lazy<SlackApiHelper> SlackLazy = new Lazy<SlackApiHelper>();
+        static readonly Lazy<MockSlackApiHelper> SlackLazy = new Lazy<MockSlackApiHelper>();
 
         static SlackApiHelper Slack => SlackLazy.Value;
 
@@ -26,51 +26,58 @@ namespace Slack.Notification.Console.Application
 
                 System.Console.WriteLine(conponents.Result.Message);
 
-                System.Console.WriteLine("Press enter to continuum.");
-                System.Console.ReadLine();
-
                 if (!conponents.Result.IsSuccess)
                 {
                     return;
                 }
 
-                var thread = new Thread(GetMessagesInternal);
+                var thread = new Thread(GetMessages);
                 thread.Start();
 
-                var message = new Message
-                {
-                    ChannelId = "general",
-                    MessageText = "Testar om meddelande kommer fram."
-                };
+                //var message = new Message
+                //{
+                //    ChannelId = "general",
+                //    MessageText = "Testar om meddelande kommer fram."
+                //};
 
-                Slack.SendMessage(message);
+                //Slack.SendMessage(message);
             }
             catch (Exception ex)
             {
                 ExceptionLogging.Trace(ex);
 
                 System.Console.WriteLine(ex.Message);
+
+                System.Console.ReadLine();
             }
         }
 
-        private static void GetMessagesInternal()
+        static void GetMessages()
         {
-            try
-            {
-                var messages = Slack.GetMessages();
+            bool hasException = false;
 
-                foreach (var message in messages)
+            while (true)
+            {
+                try
                 {
-                    System.Console.WriteLine($"{message.UserName}#{message.ChannelName}: {message.MessageText}");
+                    var messages = Slack.GetMessages();
+
+                    foreach (var message in messages)
+                    {
+                        System.Console.WriteLine($@"{message.UserName}#{message.ChannelName}: {message.MessageText}");
+                    }
                 }
+                catch (Exception ex)
+                {
+                    if (!hasException)
+                    {
+                        ExceptionLogging.Trace(ex);
 
-                GetMessagesInternal();
-            }
-            catch (Exception ex)
-            {
-                ExceptionLogging.Trace(ex);
+                        System.Console.WriteLine(ex.Message);
 
-                System.Console.WriteLine(ex.Message);
+                        hasException = true;
+                    }
+                }
             }
         }
     }

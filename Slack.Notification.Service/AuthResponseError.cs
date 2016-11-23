@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Slack.Notification.Service
 {
+    [DebuggerDisplay("ErrorCode={ErrorCode}, Description={Description}, SolutionMessage={SolutionMessage}, IsWarning={IsWarning}")]
     public class AuthResponseError
     {
         public string ErrorCode { get; set; }
@@ -12,6 +14,7 @@ namespace Slack.Notification.Service
 
         public bool IsWarning { get; set; }
 
+        //REFACTOR THIS INTO DIFFERENT UTILITY
         public static IEnumerable<AuthResponseError> GetErrorsAndWarnings
         {
             get

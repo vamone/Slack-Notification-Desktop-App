@@ -1,5 +1,8 @@
-﻿namespace Slack.Notification.Service
+﻿using System.Diagnostics;
+
+namespace Slack.Notification.Service
 {
+    [DebuggerDisplay("IsSuccess={IsSuccess}, Message={Message}")]
     public class InitializationStatus
     {
         private const string DefaultInitializationMessage = "Initialization Successful.";

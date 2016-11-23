@@ -5,7 +5,6 @@
         public InitializationResult()
         {
             this.Result = this.Result ?? new InitializationStatus();
-
             this.ResponseError = this.ResponseError ?? new AuthResponseError();
         }
 

@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 
-using Slack;
 using Slack.Intelligence;
 
-namespace SlackDesktopBubbleApplication
+namespace Slack.Notification.Service
 {
     public static class MockMessages
     {

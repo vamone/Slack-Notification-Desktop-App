@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,19 +25,17 @@ namespace SlackDesktopBubbleApplication
 
         private bool HasAnyExceptions = false;
 
-        private bool IsTestMode = false;
-
         public MainWindow()
         {
             this.InitializeComponent();
 
             AddOrRemoveMessages =
-                (m) => (Action)Dispatcher.Invoke(DispatcherPriority.Normal,
+                (m) => (Action) Dispatcher.Invoke(DispatcherPriority.Normal,
                     new Action<StackPanel>(x => this.AddOrRemoveChildren(x, m)),
                     this.NotificationArea);
 
             this.StackPanelControlls.Visibility = Visibility.Hidden;
-            this.GridOpenMessageMenu.Visibility = Visibility.Hidden;
+            //this.GridOpenMessageMenu.Visibility = Visibility.Hidden;
 
             this.MainIconArea.MouseDown += OnMouseDown;
             this.MainIconArea.MouseLeave += OnMouseLeave;
@@ -44,6 +43,24 @@ namespace SlackDesktopBubbleApplication
             this.ClearNotificationAreaTimer = new DispatcherTimer();
             this.ClearNotificationAreaTimer.Tick += ClearNotificationsTimerEventProcessor;
             this.ClearNotificationAreaTimer.Interval = new TimeSpan(0, 0, 5);
+
+            this.TextBoxChannelGroupImName.TextChanged += RenderChannelImOrGroupNameChangedText;
+        }
+
+        private void RenderChannelImOrGroupNameChangedText(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            var reg = new Regex("([#,@])(.*)");
+            var text = reg.Match(textBox.Text).Groups[2].Value;
+
+            var bb = text;
+
+            //var channelsNames = Slack.Components.Channels.Select(x => x.ChannelName).ToList();
+
+            //var channels =
+            //    channelsNames.Where(
+            //        x => x.StartsWith(text, StringComparison.InvariantCultureIgnoreCase));
         }
 
         internal void AddOrRemoveChildren(StackPanel stackPanelNotificationArea, Message message)
@@ -71,11 +88,11 @@ namespace SlackDesktopBubbleApplication
 
         internal void GetAndDisplayMessages(Func<Message, Action> action)
         {
-            while (true) //TODO: STACKOVERFLOW EXCEPTION ACCURS BY USING SAME METHOD AGAIN
+            while (true)
             {
                 try
                 {
-                    var messages = this.IsTestMode ? MockMessages.GetMockMessages() : Slack.GetMessages();
+                    var messages = Slack.GetMessages();
 
                     foreach (var message in messages)
                     {
@@ -223,6 +240,7 @@ namespace SlackDesktopBubbleApplication
 
         private void GridMainIcon_MouseLeave(object sender, MouseEventArgs e)
         {
+            //TODO: FIND BETTER LOGIC AS MANY MOUSE OVER HIDES MENU WHEN IT'S NOT A TIME
             var thread = new Thread(() =>
             {
                 Thread.Sleep(3000);
@@ -266,7 +284,8 @@ namespace SlackDesktopBubbleApplication
 
             if (e.RightButton == MouseButtonState.Pressed)
             {
-                MessageHelper.AddMessage(this.AddOrRemoveMessages, $"You are logged in as: @{Slack.MyPofile.UserName}", "system");
+                MessageHelper.AddMessage(this.AddOrRemoveMessages, $"You are logged in as: @{Slack.MyPofile.UserName}",
+                    "system");
             }
 
             if (e.ChangedButton == MouseButton.Left)
@@ -316,6 +335,59 @@ namespace SlackDesktopBubbleApplication
             {
                 this.SetInactiveColorsOnSlackShartIcon();
             }
+        }
+
+        private void TextBoxChannelGroupImName_KeyUp(object sender, KeyEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            return;
+            
+            string name = this.TextBoxChannelGroupImName.Text;
+            if (string.IsNullOrWhiteSpace(name) && name.Length < 3)
+            {
+                return;
+            }
+
+            //string tempName = name;
+
+            //if (!string.IsNullOrWhiteSpace(name))
+            //{
+            //    tempName = name.Replace("#", string.Empty).Replace("@", string.Empty);
+            //}
+
+            var channelsNames = Slack.Components.Channels.Select(x => x.ChannelName).ToList();
+
+            var channels =
+                channelsNames.Where(
+                    x => x.StartsWith(name, StringComparison.InvariantCultureIgnoreCase));
+
+            if (channels.Count() > 1)
+            {
+                return;
+            }
+
+            if (channels.Count() == 1)
+            {
+                textBox.Text = $"#{channels.SingleOrDefault()}";
+            }
+        }
+
+        private void TextBoxChannelGroupImName_KeyDown(object sender, KeyEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            var reg = new Regex("([#,@])(.*)");
+            var text = reg.Match(textBox.Text).Groups[2].Value;
+
+            //var channelsNames = Slack.Components.Channels.Select(x => x.ChannelName).ToList();
+
+            //var channels =
+            //    channelsNames.Where(
+            //        x => x.StartsWith(text, StringComparison.InvariantCultureIgnoreCase));
+
+
+            return;
         }
     }
 }

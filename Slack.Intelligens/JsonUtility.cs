@@ -54,7 +54,7 @@ namespace Slack.Intelligence
             File.WriteAllText(fullPath, json);
         }
 
-        internal static string ReadJsonFromFile(string fileName)
+        public static string ReadJsonFromFile(string fileName)
         {
             string assemblyLocation = Assembly.GetExecutingAssembly().Location;
 

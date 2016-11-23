@@ -13,6 +13,16 @@ namespace Slack.Intelligence
                 throw new ArgumentNullException(nameof(users));
             }
 
+            if (userId == null)
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException(nameof(userId));
+            }
+
             var user = users.FirstOrDefault(x => x.UserId == userId);
 
             return user?.UserName;
@@ -23,6 +33,16 @@ namespace Slack.Intelligence
             if (users == null)
             {
                 throw new ArgumentNullException(nameof(users));
+            }
+
+            if (userId == null)
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentException(nameof(userId));
             }
 
             var user = users.FirstOrDefault(x => x.UserId == userId);

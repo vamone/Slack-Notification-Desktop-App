@@ -9,49 +9,40 @@ namespace Slack.Notification.Service
     {
         public InitializationResult Initialize(string token)
         {
+            if (token == null)
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException(nameof(token));
+            }
+
             var init = new InitializationResult();
 
             try
             {
-                string url = string.Format(RequestConfig.AuthTestUrl, token);
+                var auth = this.Auth(token);
 
-                string json = this.GetContent(url);
-
-                if (json == null)
-                {
-                    throw new ArgumentNullException(nameof(json));
-                }
-
-                if (string.IsNullOrWhiteSpace(json))
-                {
-                    throw new ArgumentException(nameof(json));
-                }
-
-                var content = this.ConvertJsonIntoContent<AuthResponse>(json);
-
-                if (content == null)
-                {
-                    throw new ArgumentNullException(nameof(content));
-                }
-
-                bool isStatusOk = content.IsStatusOk;
+                bool isStatusOk = auth.IsStatusOk;
                 if (!isStatusOk)
                 {
-                    string errorCode = content.Error;
+                    string errorCode = auth.Error;
 
                     var responseError =
                         AuthResponseError.GetErrorsAndWarnings.SingleOrDefault(x => x.ErrorCode.Equals(errorCode));
 
                     init.Result.Message = responseError != null
                         ? responseError.Description
-                        : content.Error;
+                        : auth.Error;
 
                     init.ResponseError = responseError;
 
                     return init;
                 }
 
-                this.UserId = content.UserId;
+                this.UserId = auth.UserId;
                 this.Token = token;
 
                 var users = this.GetUsers();

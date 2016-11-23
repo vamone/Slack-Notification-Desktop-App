@@ -2,7 +2,7 @@
 
 namespace Slack
 {
-    public class MessageResponse
+    public class MessageSendResponse
     {
         [JsonProperty(PropertyName = "ok")]
         public bool IsStatusOk { get; set; }

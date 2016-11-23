@@ -27,14 +27,14 @@ namespace Slack.Notification.Service
 
         public User MyPofile { get; protected set; }
 
-        public void SendMessage(Message message)
+        public virtual void SendMessage(Message message)
         {
-            string url = string.Format(RequestConfig.SendMessageUrl, this.Token, message.ChannelId ?? message.UserId,
-                message.MessageText);
+            string url = string.Format(RequestUrls.SendMessageUrl, this.Token, message.ChannelId ?? message.UserId,
+                message.MessageText, this.UserId);
 
             string json = this.GetContent(url);
 
-            var content = this.ConvertJsonIntoContent<MessageResponse>(json);
+            var content = this.ConvertJsonIntoContent<MessageSendResponse>(json);
 
             bool isStatusOk = content.IsStatusOk;
             if (!isStatusOk)
@@ -43,14 +43,14 @@ namespace Slack.Notification.Service
             }
         }
 
-        public ICollection<Message> GetMessages() //TODO: MAKE IT GENRIC TYPE
+        public virtual ICollection<Message> GetMessages() //TODO: MAKE IT GENRIC TYPE
         {
             var messages = new List<Message>();
 
             foreach (var channel in this.Components.Channels)
             {
-                var url = string.Format(RequestConfig.ChannelsHistoryUrl, this.Token, channel.ChannelId,
-                    RequestConfig.TakeMessageByRequest);
+                var url = string.Format(RequestUrls.ChannelsHistoryUrl, this.Token, channel.ChannelId,
+                    RequestUrls.TakeMessageByRequest);
 
                 var json = this.GetContent(url);
 
@@ -60,8 +60,8 @@ namespace Slack.Notification.Service
 
             foreach (var im in this.Components.Ims)
             {
-                var url = string.Format(RequestConfig.ImHistoryUrl, this.Token, im.ImId,
-                    RequestConfig.TakeMessageByRequest);
+                var url = string.Format(RequestUrls.ImHistoryUrl, this.Token, im.ImId,
+                    RequestUrls.TakeMessageByRequest);
 
                 var json = this.GetContent(url);
 
@@ -71,6 +71,40 @@ namespace Slack.Notification.Service
             }
 
             return messages;
+        }
+
+        internal virtual AuthResponse Auth(string token)
+        {
+            if (token == null)
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
+
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException(nameof(token));
+            }
+
+            string url = string.Format(RequestUrls.AuthTestUrl, token);
+
+            string json = this.GetContent(url);
+            if (json == null)
+            {
+                throw new ArgumentNullException(nameof(json));
+            }
+
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                throw new ArgumentException(nameof(json));
+            }
+
+            var auth = this.ConvertJsonIntoContent<AuthResponse>(json);
+            if (auth == null)
+            {
+                throw new ArgumentNullException(nameof(auth));
+            }
+
+            return auth;
         }
 
         internal T ConvertJsonIntoContent<T>(string json)
@@ -140,18 +174,16 @@ namespace Slack.Notification.Service
             return message;
         }
 
-        internal ICollection<Bot> GetBots()
+        internal virtual ICollection<Bot> GetBots()
         {
             return new List<Bot>(); //TODO: READ FROM EXTERNAL JSON FILE
         }
 
-        internal ICollection<Channel> GetChannels()
+        internal virtual ICollection<Channel> GetChannels()
         {
-            var url = string.Format(RequestConfig.ChannelsListUrl, this.Token);
+            var url = string.Format(RequestUrls.ChannelsListUrl, this.Token);
 
-            Func<string> getJson = () => this.GetContent(url);
-
-            string json = JsonUtility.GetJson(getJson, "channels");
+            string json =  this.GetContent(url);
 
             var content = this.ConvertJsonIntoContent<ChannelParent>(json);
 
@@ -164,7 +196,7 @@ namespace Slack.Notification.Service
             return content.Channels;
         }
 
-        internal virtual string GetContent(string url)
+        protected virtual string GetContent(string url)
         {
             if (url == null)
             {
@@ -185,38 +217,32 @@ namespace Slack.Notification.Service
             return json;
         }
 
-        public static string Base64Encode(string plainText)
+        protected virtual ICollection<EmojiParent> GetEmojis()
         {
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
-            return System.Convert.ToBase64String(plainTextBytes);
+            //var url = string.Format(RequestConfig.EmojiUrl, this.Token);
+
+            //Func<string> getJson = () => this.GetContent(url);
+
+            //string json = JsonUtility.GetJson(getJson, "emoji");
+
+            //var content = this.ConvertJsonIntoContent<EmojiParent>(json);
+
+            //bool isStatusOk = content.IsStatusOk;
+            //if (!isStatusOk)
+            //{
+            //    throw new SlackApiHelpereException(content.Error);
+            //}
+
+            //return null;
+
+            return new List<EmojiParent>();
         }
 
-        internal ICollection<EmojiParent> GetEmojis()
+        protected virtual ICollection<Im> GetIms()
         {
-            var url = string.Format(RequestConfig.EmojiUrl, this.Token);
+            var url = string.Format(RequestUrls.ImListUrl, this.Token);
 
-            Func<string> getJson = () => this.GetContent(url);
-
-            string json = JsonUtility.GetJson(getJson, "emoji");
-
-            var content = this.ConvertJsonIntoContent<EmojiParent>(json);
-
-            bool isStatusOk = content.IsStatusOk;
-            if (!isStatusOk)
-            {
-                throw new SlackApiHelpereException(content.Error);
-            }
-
-            return null;
-        }
-
-        internal ICollection<Im> GetIms()
-        {
-            var url = string.Format(RequestConfig.ImListUrl, this.Token);
-
-            Func<string> getJson = () => this.GetContent(url);
-
-            string json = JsonUtility.GetJson(getJson, "ims");
+            string json =  this.GetContent(url);
 
             var content = this.ConvertJsonIntoContent<ImParent>(json);
 
@@ -247,13 +273,11 @@ namespace Slack.Notification.Service
                     .ToList();
         }
 
-        internal ICollection<User> GetUsers()
+        protected virtual ICollection<User> GetUsers()
         {
-            var url = string.Format(RequestConfig.UserListUrl, this.Token);
+            var url = string.Format(RequestUrls.UserListUrl, this.Token);
 
-            Func<string> getJson = () => this.GetContent(url);
-
-            string json = JsonUtility.GetJson(getJson, "users");
+            string json = this.GetContent(url);
 
             var content = this.ConvertJsonIntoContent<UserParent>(json);
 
