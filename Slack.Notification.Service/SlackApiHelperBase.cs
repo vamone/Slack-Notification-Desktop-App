@@ -193,19 +193,19 @@ namespace Slack.Notification.Service
 
         internal ICollection<EmojiParent> GetEmojis()
         {
-            var url = string.Format(RequestConfig.EmojiUrl, this.Token);
+            //var url = string.Format(RequestConfig.EmojiUrl, this.Token);
 
-            Func<string> getJson = () => this.GetContent(url);
+            //Func<string> getJson = () => this.GetContent(url);
 
-            string json = JsonUtility.GetJson(getJson, "emoji");
+            //string json = JsonUtility.GetJson(getJson, "emoji");
 
-            var content = this.ConvertJsonIntoContent<EmojiParent>(json);
+            //var content = this.ConvertJsonIntoContent<EmojiParent>(json);
 
-            bool isStatusOk = content.IsStatusOk;
-            if (!isStatusOk)
-            {
-                throw new SlackApiHelpereException(content.Error);
-            }
+            //bool isStatusOk = content.IsStatusOk;
+            //if (!isStatusOk)
+            //{
+            //    throw new SlackApiHelpereException(content.Error);
+            //}
 
             return null;
         }

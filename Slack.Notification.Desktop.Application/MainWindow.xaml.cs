@@ -30,8 +30,8 @@ namespace SlackDesktopBubbleApplication
         {
             this.InitializeComponent();
 
-            AddOrRemoveMessages =
-                (m) => (Action)Dispatcher.Invoke(DispatcherPriority.Normal,
+            this.AddOrRemoveMessages =
+                (m) => (Action) this.Dispatcher.Invoke(DispatcherPriority.Normal,
                     new Action<StackPanel>(x => this.AddOrRemoveChildren(x, m)),
                     this.NotificationArea);
 
