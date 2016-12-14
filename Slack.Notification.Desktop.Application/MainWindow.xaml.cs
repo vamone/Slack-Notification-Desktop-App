@@ -163,26 +163,26 @@ namespace SlackDesktopBubbleApplication
 
         internal void SetColorsOnSlackSharpIcon()
         {
-            this.SlackLineGreen.Background = SolidColorBrushUtility.SlackGreen;
-            this.SlackLineYellow.Background = SolidColorBrushUtility.SlackYellow;
-            this.SlackLineBlue.Background = SolidColorBrushUtility.SlackBlue;
-            this.SlackLineRed.Background = SolidColorBrushUtility.SlackRed;
+            this.SlackLineGreen.Background = SolidColorBrushHelper.SlackGreen;
+            this.SlackLineYellow.Background = SolidColorBrushHelper.SlackYellow;
+            this.SlackLineBlue.Background = SolidColorBrushHelper.SlackBlue;
+            this.SlackLineRed.Background = SolidColorBrushHelper.SlackRed;
         }
 
         internal void SetInactiveColorsOnSlackShartIcon()
         {
-            this.SlackLineGreen.Background = SolidColorBrushUtility.SlackDarkBlue;
-            this.SlackLineYellow.Background = SolidColorBrushUtility.SlackDarkBlue;
-            this.SlackLineBlue.Background = SolidColorBrushUtility.SlackDarkBlue;
-            this.SlackLineRed.Background = SolidColorBrushUtility.SlackDarkBlue;
+            this.SlackLineGreen.Background = SolidColorBrushHelper.SlackDarkBlue;
+            this.SlackLineYellow.Background = SolidColorBrushHelper.SlackDarkBlue;
+            this.SlackLineBlue.Background = SolidColorBrushHelper.SlackDarkBlue;
+            this.SlackLineRed.Background = SolidColorBrushHelper.SlackDarkBlue;
         }
 
         internal void UnSetColorsOnSlackSharpIcon()
         {
-            this.SlackLineGreen.Background = SolidColorBrushUtility.AliceBlue;
-            this.SlackLineYellow.Background = SolidColorBrushUtility.AliceBlue;
-            this.SlackLineBlue.Background = SolidColorBrushUtility.AliceBlue;
-            this.SlackLineRed.Background = SolidColorBrushUtility.AliceBlue;
+            this.SlackLineGreen.Background = SolidColorBrushHelper.AliceBlue;
+            this.SlackLineYellow.Background = SolidColorBrushHelper.AliceBlue;
+            this.SlackLineBlue.Background = SolidColorBrushHelper.AliceBlue;
+            this.SlackLineRed.Background = SolidColorBrushHelper.AliceBlue;
         }
 
         //internal void SetWarningColorsOnSlackSharpIcon()

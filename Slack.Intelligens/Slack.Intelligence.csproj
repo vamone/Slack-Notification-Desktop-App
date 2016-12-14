@@ -52,8 +52,7 @@
     <Compile Include="JsonUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegistryUtility.cs" />
-    <Compile Include="UserMethods.cs" />
-    <Compile Include="WebRequestResult.cs" />
+    <Compile Include="StringUtility.cs" />
     <Compile Include="WebRequestUtility.cs" />
   </ItemGroup>
   <ItemGroup>

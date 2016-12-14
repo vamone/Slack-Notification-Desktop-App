@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace SlackDesktopBubbleApplication
 {
-    public static class SolidColorBrushUtility
+    public static class SolidColorBrushHelper
     {
         private const string AliceBlueHexColor = "#FFF0F8FF";
 
