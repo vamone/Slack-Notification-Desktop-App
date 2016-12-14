@@ -64,7 +64,7 @@
     <Compile Include="SettingsWindow.xaml.cs">
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SolidColorBrushUtility.cs" />
+    <Compile Include="SolidColorBrushHelper.cs" />
     <Compile Include="WindowHelper.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
