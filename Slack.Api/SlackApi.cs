@@ -34,7 +34,7 @@ namespace Slack.Api
 
                 var users = UsersHelper.GetUsers(token);
 
-                this.Components.Profile = ProfileHelper.GetProfile(auth.UserId);
+                this.Components.Profile = ProfileHelper.GetProfile(users, auth.UserId);
                 this.Components.Channels = ChannelHelper.GetChannels(token);
                 this.Components.Ims = ImHelper.GetIms(token);
                 this.Components.Users = users;

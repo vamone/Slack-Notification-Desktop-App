@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Net;
 using System.Text;
 
-namespace Slack.Intelligence
+namespace Slack.Api
 {
     public static class WebRequestUtility
     {
@@ -32,7 +31,7 @@ namespace Slack.Intelligence
         {
             encoding = encoding ?? Encoding.UTF8; //TODO: SUPPORT FOR OTHER LANGUAGES
 
-            var request = WebRequest.CreateHttp(url);
+            var request = System.Net.WebRequest.CreateHttp(url);
 
             var timeout = (int) TimeSpan.FromSeconds(10).TotalMilliseconds;
 

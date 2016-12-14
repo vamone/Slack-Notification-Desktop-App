@@ -13,7 +13,7 @@ namespace Slack.Api.Tests
             var slackApi = new SlackApi();
 
             //Act
-            Action action = () => slackApi.InitializeComponents(null);
+            Action action = () => slackApi.Initialize(null);
 
             //Assert
             Assert.Throws<SlackApiException>(action);
@@ -26,7 +26,7 @@ namespace Slack.Api.Tests
             var slackApi = new SlackApi();
 
             //Act
-            Action action = () => slackApi.InitializeComponents(string.Empty);
+            Action action = () => slackApi.Initialize(string.Empty);
 
             //Assert
             Assert.Throws<SlackApiException>(action);

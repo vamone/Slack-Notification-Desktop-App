@@ -8,5 +8,9 @@ namespace Slack.Api
 {
     public class UsersHelper
     {
+        public static ICollection<User> GetUsers(string token)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

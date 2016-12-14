@@ -4,7 +4,7 @@ namespace Slack.Api
 {
     public interface ISlackApi
     {
-        InitializationResults InitializeComponents(string token);
+        InitializationResults Initialize(string token);
 
         Components Components { get; set; }
 

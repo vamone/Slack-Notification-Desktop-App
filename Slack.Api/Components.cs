@@ -4,13 +4,14 @@ namespace Slack.Api
 {
     public class Components
     {
-        public Components()
+        public Components(ICollection<Bot> bots, ICollection<Channel> channels, ICollection<EmojiParent> emojis,
+            ICollection<Im> ims, ICollection<User> users)
         {
-            this.Bots = this.Bots ?? new List<Bot>();
-            this.Channels = this.Channels ?? new List<Channel>();
-            this.Emojis = this.Emojis ?? new List<EmojiParent>();
-            this.Ims = this.Ims ?? new List<Im>();
-            this.Users = this.Users ?? new List<User>();
+            this.Bots = bots ?? new List<Bot>();
+            this.Channels = channels ?? new List<Channel>();
+            this.Emojis = emojis ?? new List<EmojiParent>();
+            this.Ims = ims ?? new List<Im>();
+            this.Users = users ?? new List<User>();
         }
 
         public User Profile { get; set; }
