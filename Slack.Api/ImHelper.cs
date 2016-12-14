@@ -1,33 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using Slack.Intelligence;
 
 namespace Slack.Api
 {
-    public class ImHelper : IHelper
+    public class ImHelper
     {
         public static ICollection<Im> GetIms(string token)
         {
-            throw new NotImplementedException();
-        }
-
-        public static ICollection<Im> GetIms(string token)
-        {
-            var url = string.Format(RequestUrls.ImListUrl, this.Token);
-
-            string json = this.GetContent(url);
-
-            var content = this.ConvertJsonIntoContent<ImParent>(json);
-
-            bool isStatusOk = content.IsStatusOk;
-            if (!isStatusOk)
+            if (token == null)
             {
-                throw new SlackApiHelpereException(content.Error);
+                throw new ArgumentNullException(nameof(token));
             }
 
-            return content.Ims;
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException(nameof(token));
+            }
+
+            var url = RequestUrlFactory.BuildUrl(RequestUrlFactory.ImListUrl, token);
+
+            string json = WebRequestUtility.GetContent(url);
+
+            var ims = GetImsInternal(json);
+
+            return ims;
+        }
+
+        internal static ICollection<Im> GetImsInternal(string json)
+        {
+            if (json == null)
+            {
+                throw new ArgumentNullException(nameof(json));
+            }
+
+            if (string.IsNullOrWhiteSpace(json))
+            {
+                throw new ArgumentException(nameof(json));
+            }
+
+            var ims = JsonUtility.ConvertJsonIntoObject<ImParent>(json);
+            if (ims == null)
+            {
+                throw new ArgumentNullException(nameof(ims));
+            }
+
+            if (!ims.IsStatusOk)
+            {
+                throw new SlackApiException(ims.Error);
+            }
+
+            return ims.Ims;
         }
     }
 }

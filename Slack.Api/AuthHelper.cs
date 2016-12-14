@@ -1,40 +1,31 @@
 ﻿using System;
 using System.Linq;
 
+using Slack.Intelligence;
+
 namespace Slack.Api
 {
-    public class AuthHelper : IHelper
+    public class AuthHelper
     {
-        public static AuthResponse GetAuthResponse(string token, IWebRequest webRequest = null)
+        public static AuthResponse GetAuthResponse(string token)
         {
-            var url = RequestUrlFactory.BuildUrl(token, RequestUrlFactory.AuthTestUrl);
+            if (token == null)
+            {
+                throw new ArgumentNullException(nameof(token));
+            }
 
-            string json = webRequest == null ? WebRequestUtility.GetContent(url) : webRequest.GetContent(url);
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                throw new ArgumentException(nameof(token));
+            }
+
+            var url = RequestUrlFactory.BuildUrl(RequestUrlFactory.AuthTestUrl, token);
+
+            string json = WebRequestUtility.GetContent(url);
 
             var auth = GetAuthResponseInternal(json);
 
             return auth;
-        }
-
-        public static void Validate(AuthResponse auth)
-        {
-            if (auth == null)
-            {
-                throw new ArgumentNullException(nameof(auth));
-            }
-
-            bool isStatusOk = auth.IsStatusOk;
-            if (!isStatusOk)
-            {
-                var responseError =
-                    AuthErrorsAndWarnings.Get.SingleOrDefault(x => x.ErrorCode.Equals(auth.Error));
-
-                string message = responseError != null
-                    ? responseError.Description
-                    : auth.Error;
-
-                throw new AuthException(message);
-            }
         }
 
         internal static AuthResponse GetAuthResponseInternal(string json)
@@ -53,6 +44,18 @@ namespace Slack.Api
             if (auth == null)
             {
                 throw new ArgumentNullException(nameof(auth));
+            }
+
+            if (!auth.IsStatusOk)
+            {
+                var responseError =
+                    AuthErrorsAndWarnings.Get.SingleOrDefault(x => x.ErrorCode.Equals(auth.Error));
+
+                string message = responseError != null
+                    ? responseError.Description
+                    : auth.Error;
+
+                throw new SlackApiException(message);
             }
 
             return auth;

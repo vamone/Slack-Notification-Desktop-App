@@ -39,10 +39,6 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="SlackNotificationService, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\References\SlackNotificationService.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -137,13 +133,13 @@
     </Resource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Slack.Api\Slack.Api.csproj">
+      <Project>{ECA48666-1F8C-4A86-A2CC-127056B21A94}</Project>
+      <Name>Slack.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Slack.Intelligens\Slack.Intelligence.csproj">
       <Project>{ec342735-a58c-4150-a465-c1fc39906305}</Project>
       <Name>Slack.Intelligence</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Slack.Notification.Service\Slack.Notification.Service.csproj">
-      <Project>{2f7d2908-838f-4ec7-948f-198ada31f154}</Project>
-      <Name>Slack.Notification.Service</Name>
     </ProjectReference>
     <ProjectReference Include="..\Slack\Slack.csproj">
       <Project>{9b8d0e0a-bc01-4563-9089-bb10e7232132}</Project>

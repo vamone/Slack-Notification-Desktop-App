@@ -5,9 +5,6 @@ using System.Linq;
 namespace Slack.Api
 {
     [DebuggerDisplay("IsSuccess={IsSuccess}, Message={Message}")]
-    [DebuggerDisplay(
-        "ErrorCode={AuthResponseError.ErrorCode}, Description={AuthResponseError.Description}, SolutionMessage={AuthResponseError.SolutionMessage}, IsWarning={AuthResponseError.IsWarning}"
-        )]
     public class InitializationResults
     {
         private const string DefaultInitializationMessage = "Initialization Successful.";
@@ -20,7 +17,5 @@ namespace Slack.Api
         public bool IsSuccess { get; set; }
 
         public string Message { get; set; }
-
-        public AuthResponseError AuthResponseError { get; set; }
     }
 }

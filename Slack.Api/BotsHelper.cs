@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Slack.Api
 {
-    public class BotsHelper : IHelper
+    public class BotsHelper
     {
         public static ICollection<Bot> GetBots(string token)
         {
-            throw new NotImplementedException();
+            return new List<Bot>();
         }
     }
 }

@@ -1,16 +1,16 @@
 ﻿using System;
 using System.Threading;
 
+using Slack.Api;
 using Slack.Intelligence;
-using Slack.Notification.Service;
 
 namespace Slack.Notification.Console.Application
 {
     public class Program
     {
-        static readonly Lazy<MockSlackApiHelper> SlackLazy = new Lazy<MockSlackApiHelper>();
+        static readonly Lazy<SlackApi> SlackLazy = new Lazy<SlackApi>();
 
-        static SlackApiHelper Slack => SlackLazy.Value;
+        static SlackApi Slack => SlackLazy.Value;
 
         public static void Main(string[] args)
         {
@@ -18,15 +18,15 @@ namespace Slack.Notification.Console.Application
             {
                 string token = RegistryUtility.Read("MyToken");
 
-                var conponents = Slack.Initialize(token);
-                if (conponents == null)
+                var init = Slack.Initialize(token);
+                if (init == null)
                 {
-                    throw new ArgumentNullException(nameof(conponents));
+                    throw new ArgumentNullException(nameof(init));
                 }
 
-                System.Console.WriteLine(conponents.Status.Message);
+                System.Console.WriteLine(init.Message);
 
-                if (!conponents.Status.IsSuccess)
+                if (!init.IsSuccess)
                 {
                     return;
                 }

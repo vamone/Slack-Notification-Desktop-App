@@ -8,29 +8,29 @@ using System.Windows.Input;
 using System.Windows.Threading;
 
 using Slack;
+using Slack.Api;
 using Slack.Intelligence;
-using Slack.Notification.Service;
 
 namespace SlackDesktopBubbleApplication
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         internal DispatcherTimer ClearNotificationAreaTimer;
 
-        static readonly Lazy<SlackApiHelper> SlackLazy = new Lazy<SlackApiHelper>();
+        static readonly Lazy<SlackApi> SlackLazy = new Lazy<SlackApi>();
 
-        static SlackApiHelper Slack => SlackLazy.Value;
+        static SlackApi Slack => SlackLazy.Value;
 
-        private Func<Message, Action> AddOrRemoveMessages;
+        private readonly Func<Message, Action> _addOrRemoveMessages;
 
-        //private bool HasAnyExceptions = false;
+        private bool _hasAnyExceptions = false;
 
         public MainWindow()
         {
             this.InitializeComponent();
 
-            AddOrRemoveMessages =
-                (m) => (Action) Dispatcher.Invoke(DispatcherPriority.Normal,
+            this._addOrRemoveMessages =
+                (m) => (Action) this.Dispatcher.Invoke(DispatcherPriority.Normal,
                     new Action<StackPanel>(x => this.AddOrRemoveChildren(x, m)),
                     this.NotificationArea);
 
@@ -99,9 +99,9 @@ namespace SlackDesktopBubbleApplication
                         action.Invoke(message);
                     }
                 }
-                catch (SlackApiHelpereException ex)
+                catch (SlackApiException ex)
                 {
-                    if (!this.HasAnyExceptions)
+                    if (!this._hasAnyExceptions)
                     {
                         MessageHelper.AddMessage(action,
                             $"Error: {ex.Message}", "system");
@@ -109,13 +109,13 @@ namespace SlackDesktopBubbleApplication
                         ExceptionLogging.Trace(ex);
                     }
 
-                    this.HasAnyExceptions = true;
+                    this._hasAnyExceptions = true;
 
                     this.ClearNotificationAreaTimer.Stop();
                 }
                 catch (Exception ex)
                 {
-                    if (!this.HasAnyExceptions)
+                    if (!this._hasAnyExceptions)
                     {
                         MessageHelper.AddMessage(action,
                             $"Error: {ex.Message}", "system");
@@ -123,7 +123,7 @@ namespace SlackDesktopBubbleApplication
                         ExceptionLogging.Trace(ex);
                     }
 
-                    this.HasAnyExceptions = true;
+                    this._hasAnyExceptions = true;
 
                     this.ClearNotificationAreaTimer.Stop();
                 }
@@ -133,16 +133,25 @@ namespace SlackDesktopBubbleApplication
         internal bool IsSlackInitialized()
         {
             string token = RegistryUtility.Read("MyToken");
-
+            
             var init = Slack.Initialize(token);
+            if (init == null)
+            {
+                string messageText =
+                    $"Error: Initialization failed.";
 
-            bool hasInitSuccess = init.Status.IsSuccess;
+                MessageHelper.AddMessage(this._addOrRemoveMessages, messageText, "system");
+
+                return false;
+            }
+
+            bool hasInitSuccess = init.IsSuccess;
             if (!hasInitSuccess)
             {
                 string messageText =
-                    $"Error: {init.Status.Message}\nSolution: {init.AuthResponseError.SolutionMessage}";
+                    $"Error: {init.Message}";
 
-                MessageHelper.AddMessage(this.AddOrRemoveMessages, messageText, "system");
+                MessageHelper.AddMessage(this._addOrRemoveMessages, messageText, "system");
 
                 //TODO: START RED LINE BLINK
 
@@ -245,7 +254,7 @@ namespace SlackDesktopBubbleApplication
             {
                 Thread.Sleep(3000);
 
-                Dispatcher.Invoke(DispatcherPriority.Normal,
+                this.Dispatcher.Invoke(DispatcherPriority.Normal,
                     new Action<StackPanel>(this.SetVisibilityHidden),
                     this.StackPanelControlls);
             });
@@ -284,7 +293,7 @@ namespace SlackDesktopBubbleApplication
 
             if (e.RightButton == MouseButtonState.Pressed)
             {
-                MessageHelper.AddMessage(this.AddOrRemoveMessages, $"You are logged in as: @{Slack.MyPofile.UserName}",
+                MessageHelper.AddMessage(this._addOrRemoveMessages, $"You are logged in as: @{Slack.Components?.Profile?.UserName}",
                     "system");
             }
 
@@ -292,9 +301,9 @@ namespace SlackDesktopBubbleApplication
             {
                 if (e.ClickCount >= 2)
                 {
-                    this.HasAnyExceptions = false;
+                    this._hasAnyExceptions = false;
 
-                    MessageHelper.AddMessage(this.AddOrRemoveMessages, "Bubble has been restarted.", "system");
+                    MessageHelper.AddMessage(this._addOrRemoveMessages, "Bubble has been restarted.", "system");
 
                     this.ClearNotificationAreaTimer.Start();
                 }
@@ -320,7 +329,7 @@ namespace SlackDesktopBubbleApplication
                     return;
                 }
 
-                var thread = new Thread(() => this.GetAndDisplayMessages(this.AddOrRemoveMessages));
+                var thread = new Thread(() => this.GetAndDisplayMessages(this._addOrRemoveMessages));
                 thread.Start();
 
                 this.ClearNotificationAreaTimer?.Start();
@@ -329,7 +338,7 @@ namespace SlackDesktopBubbleApplication
             {
                 ExceptionLogging.Trace(ex);
 
-                MessageHelper.AddMessage(this.AddOrRemoveMessages, $"Error: {ex.Message}", "system");
+                MessageHelper.AddMessage(this._addOrRemoveMessages, $"Error: {ex.Message}", "system");
             }
             finally
             {
@@ -342,7 +351,7 @@ namespace SlackDesktopBubbleApplication
             var textBox = sender as TextBox;
 
             return;
-            
+
             string name = this.TextBoxChannelGroupImName.Text;
             if (string.IsNullOrWhiteSpace(name) && name.Length < 3)
             {
