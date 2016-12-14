@@ -49,12 +49,10 @@
     <Compile Include="Components.cs" />
     <Compile Include="InitializationResult.cs" />
     <Compile Include="InitializationStatus.cs" />
-    <Compile Include="ISlackApi.cs" />
     <Compile Include="MockMessages.cs" />
     <Compile Include="MockSlackApiHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RequestUrls.cs" />
-    <Compile Include="SlackApi.cs" />
     <Compile Include="SlackApiHelper.cs" />
     <Compile Include="SlackApiHelperBase.cs" />
     <Compile Include="SlackApiHelperException.cs" />

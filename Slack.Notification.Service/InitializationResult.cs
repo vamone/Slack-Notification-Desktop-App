@@ -1,15 +1,24 @@
-﻿namespace Slack.Notification.Service
+﻿using System.Diagnostics;
+
+namespace Slack.Notification.Service
 {
-    public class InitializationResult
+    [DebuggerDisplay("IsSuccess={IsSuccess}, Message={Message}")]
+    [DebuggerDisplay(
+         "ErrorCode={AuthResponseError.ErrorCode}, Description={AuthResponseError.Description}, SolutionMessage={AuthResponseError.SolutionMessage}, IsWarning={AuthResponseError.IsWarning}"
+     )]
+    public class InitializationResults
     {
-        public InitializationResult()
+        private const string DefaultInitializationMessage = "Initialization Successful.";
+
+        public InitializationResults()
         {
-            this.Result = this.Result ?? new InitializationStatus();
-            this.ResponseError = this.ResponseError ?? new AuthResponseError();
+            this.Message = DefaultInitializationMessage;
         }
 
-        public InitializationStatus Result { get; set; }
+        public bool IsSuccess { get; set; }
 
-        public AuthResponseError ResponseError { get; set; }
+        public string Message { get; set; }
+
+        public AuthResponseError AuthResponseError { get; set; }
     }
 }

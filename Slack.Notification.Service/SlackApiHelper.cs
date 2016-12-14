@@ -7,7 +7,7 @@ namespace Slack.Notification.Service
 {
     public class SlackApiHelper : SlackApiHelperBase
     {
-        public InitializationResult Initialize(string token)
+        public InitializationResults Initialize(string token)
         {
             if (token == null)
             {
@@ -19,7 +19,7 @@ namespace Slack.Notification.Service
                 throw new ArgumentException(nameof(token));
             }
 
-            var init = new InitializationResult();
+            var init = new InitializationResults();
 
             try
             {
@@ -33,11 +33,11 @@ namespace Slack.Notification.Service
                     var responseError =
                         AuthResponseError.GetErrorsAndWarnings.SingleOrDefault(x => x.ErrorCode.Equals(errorCode));
 
-                    init.Result.Message = responseError != null
+                    init.Message = responseError != null
                         ? responseError.Description
                         : auth.Error;
 
-                    init.ResponseError = responseError;
+                    init.AuthResponseError = responseError;
 
                     return init;
                 }
@@ -57,13 +57,13 @@ namespace Slack.Notification.Service
             }
             catch (Exception ex)
             {
-                init.Result.Message = ex.Message;
-                init.Result.IsSuccess = false;
+                init.Message = ex.Message;
+                init.IsSuccess = false;
 
                 return init;
             }
 
-            init.Result.IsSuccess = true;
+            init.IsSuccess = true;
 
             return init;
         }

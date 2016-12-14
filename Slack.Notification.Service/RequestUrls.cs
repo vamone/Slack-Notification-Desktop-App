@@ -1,7 +1,12 @@
 ﻿namespace Slack.Notification.Service
 {
-    class RequestUrls
+    public class RequestUrls
     {
+        public RequestUrls(string urlQuery)
+        {
+            
+        }
+
         internal const string ChannelsListUrl = "https://slack.com/api/channels.list?token={0}&pretty=1";
 
         internal const string ChannelsHistoryUrl =

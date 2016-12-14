@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Slack.Api
 {
-    public class Class1
+    public interface IHelper
     {
     }
 }

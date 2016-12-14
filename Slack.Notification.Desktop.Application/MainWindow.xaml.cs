@@ -23,7 +23,7 @@ namespace SlackDesktopBubbleApplication
 
         private Func<Message, Action> AddOrRemoveMessages;
 
-        private bool HasAnyExceptions = false;
+        //private bool HasAnyExceptions = false;
 
         public MainWindow()
         {
@@ -136,11 +136,11 @@ namespace SlackDesktopBubbleApplication
 
             var init = Slack.Initialize(token);
 
-            bool hasInitSuccess = init.Result.IsSuccess;
+            bool hasInitSuccess = init.Status.IsSuccess;
             if (!hasInitSuccess)
             {
                 string messageText =
-                    $"Error: {init.Result.Message}\nSolution: {init.ResponseError.SolutionMessage}";
+                    $"Error: {init.Status.Message}\nSolution: {init.AuthResponseError.SolutionMessage}";
 
                 MessageHelper.AddMessage(this.AddOrRemoveMessages, messageText, "system");
 

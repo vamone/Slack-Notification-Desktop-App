@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using Newtonsoft.Json;
 
 namespace Slack
 {
@@ -19,7 +20,7 @@ namespace Slack
 
         public string ChannelName { get; set; }
 
-        public  string ChannelId { get; set; }
+        public string ChannelId { get; set; }
 
         public bool IsGroupMessage { get; set; }
 
@@ -28,13 +29,20 @@ namespace Slack
         [JsonProperty(PropertyName = "ts")]
         public double Timestamp { get; set; }
 
-        internal bool IsValidated(Message message)
+        public void Validate()
         {
-            //TODO: EXPAND VALIDATION
+            bool isValidated = this.IsValidated();
+            if (!isValidated)
+            {
+                throw new ObjectNotValidatedException(typeof(Message));
+            }
+        }
 
-            return (string.IsNullOrWhiteSpace(message.UserId) ||
-                    string.IsNullOrWhiteSpace(message.BotId)) && string.IsNullOrWhiteSpace(message.MessageText) &&
-                   string.IsNullOrWhiteSpace(message.ChannelName);
+        internal bool IsValidated()
+        {
+            return (string.IsNullOrWhiteSpace(this.UserId) ||
+                    string.IsNullOrWhiteSpace(this.BotId)) && string.IsNullOrWhiteSpace(this.MessageText) &&
+                   string.IsNullOrWhiteSpace(this.ChannelId);
         }
     }
 }

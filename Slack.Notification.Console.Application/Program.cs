@@ -24,9 +24,9 @@ namespace Slack.Notification.Console.Application
                     throw new ArgumentNullException(nameof(conponents));
                 }
 
-                System.Console.WriteLine(conponents.Result.Message);
+                System.Console.WriteLine(conponents.Status.Message);
 
-                if (!conponents.Result.IsSuccess)
+                if (!conponents.Status.IsSuccess)
                 {
                     return;
                 }

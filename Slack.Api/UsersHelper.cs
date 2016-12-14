@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SlackApiTests
+namespace Slack.Api
 {
-    public class Class1
+    public class UsersHelper
     {
     }
 }
