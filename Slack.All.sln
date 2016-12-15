@@ -7,13 +7,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack", "Slack\Slack.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Intelligence", "Slack.Intelligens\Slack.Intelligence.csproj", "{EC342735-A58C-4150-A465-C1FC39906305}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Notification.Service", "Slack.Notification.Service\Slack.Notification.Service.csproj", "{2F7D2908-838F-4EC7-948F-198ADA31F154}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Notification.Desktop.Application", "Slack.Notification.Desktop.Application\Slack.Notification.Desktop.Application.csproj", "{AA90A7AD-014F-4F2B-8716-A6572B11213B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Notification.Console.Application", "Slack.Notification.Console.Application\Slack.Notification.Console.Application.csproj", "{18587AC5-7261-4ADE-8387-4635123FFD45}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{08898956-6413-45DA-AE17-E48BB4EE5498}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{4F5A1273-48AC-42BE-8AA7-8A33D944362E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Api.Test", "SlackApiTests\Slack.Api.Test.csproj", "{F6B04CD9-8E3B-46C5-A574-6C9B9F328F23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Api", "Slack.Api\Slack.Api.csproj", "{ECA48666-1F8C-4A86-A2CC-127056B21A94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +33,6 @@ Global
 		{EC342735-A58C-4150-A465-C1FC39906305}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC342735-A58C-4150-A465-C1FC39906305}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC342735-A58C-4150-A465-C1FC39906305}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2F7D2908-838F-4EC7-948F-198ADA31F154}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2F7D2908-838F-4EC7-948F-198ADA31F154}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2F7D2908-838F-4EC7-948F-198ADA31F154}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2F7D2908-838F-4EC7-948F-198ADA31F154}.Release|Any CPU.Build.0 = Release|Any CPU
 		{AA90A7AD-014F-4F2B-8716-A6572B11213B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{AA90A7AD-014F-4F2B-8716-A6572B11213B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA90A7AD-014F-4F2B-8716-A6572B11213B}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,6 +41,14 @@ Global
 		{18587AC5-7261-4ADE-8387-4635123FFD45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18587AC5-7261-4ADE-8387-4635123FFD45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18587AC5-7261-4ADE-8387-4635123FFD45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6B04CD9-8E3B-46C5-A574-6C9B9F328F23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6B04CD9-8E3B-46C5-A574-6C9B9F328F23}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6B04CD9-8E3B-46C5-A574-6C9B9F328F23}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6B04CD9-8E3B-46C5-A574-6C9B9F328F23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECA48666-1F8C-4A86-A2CC-127056B21A94}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECA48666-1F8C-4A86-A2CC-127056B21A94}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECA48666-1F8C-4A86-A2CC-127056B21A94}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECA48666-1F8C-4A86-A2CC-127056B21A94}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,8 +56,9 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9B8D0E0A-BC01-4563-9089-BB10E7232132} = {08898956-6413-45DA-AE17-E48BB4EE5498}
 		{EC342735-A58C-4150-A465-C1FC39906305} = {08898956-6413-45DA-AE17-E48BB4EE5498}
-		{2F7D2908-838F-4EC7-948F-198ADA31F154} = {08898956-6413-45DA-AE17-E48BB4EE5498}
 		{AA90A7AD-014F-4F2B-8716-A6572B11213B} = {08898956-6413-45DA-AE17-E48BB4EE5498}
 		{18587AC5-7261-4ADE-8387-4635123FFD45} = {08898956-6413-45DA-AE17-E48BB4EE5498}
+		{F6B04CD9-8E3B-46C5-A574-6C9B9F328F23} = {4F5A1273-48AC-42BE-8AA7-8A33D944362E}
+		{ECA48666-1F8C-4A86-A2CC-127056B21A94} = {08898956-6413-45DA-AE17-E48BB4EE5498}
 	EndGlobalSection
 EndGlobal

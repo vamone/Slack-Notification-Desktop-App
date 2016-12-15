@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -7,36 +8,34 @@ using System.Windows.Input;
 using System.Windows.Threading;
 
 using Slack;
+using Slack.Api;
 using Slack.Intelligence;
-using Slack.Notification.Service;
 
 namespace SlackDesktopBubbleApplication
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         internal DispatcherTimer ClearNotificationAreaTimer;
 
-        static readonly Lazy<SlackApiHelper> SlackLazy = new Lazy<SlackApiHelper>();
+        static readonly Lazy<SlackApi> SlackLazy = new Lazy<SlackApi>();
 
-        static SlackApiHelper Slack => SlackLazy.Value;
+        static SlackApi Slack => SlackLazy.Value;
 
-        private Func<Message, Action> AddOrRemoveMessages;
+        private readonly Func<Message, Action> _addOrRemoveMessages;
 
-        private bool HasAnyExceptions = false;
-
-        private bool IsTestMode = false;
+        private bool _hasAnyExceptions = false;
 
         public MainWindow()
         {
             this.InitializeComponent();
 
-            this.AddOrRemoveMessages =
+            this._addOrRemoveMessages =
                 (m) => (Action) this.Dispatcher.Invoke(DispatcherPriority.Normal,
                     new Action<StackPanel>(x => this.AddOrRemoveChildren(x, m)),
                     this.NotificationArea);
 
             this.StackPanelControlls.Visibility = Visibility.Hidden;
-            this.GridOpenMessageMenu.Visibility = Visibility.Hidden;
+            //this.GridOpenMessageMenu.Visibility = Visibility.Hidden;
 
             this.MainIconArea.MouseDown += OnMouseDown;
             this.MainIconArea.MouseLeave += OnMouseLeave;
@@ -44,6 +43,24 @@ namespace SlackDesktopBubbleApplication
             this.ClearNotificationAreaTimer = new DispatcherTimer();
             this.ClearNotificationAreaTimer.Tick += ClearNotificationsTimerEventProcessor;
             this.ClearNotificationAreaTimer.Interval = new TimeSpan(0, 0, 5);
+
+            this.TextBoxChannelGroupImName.TextChanged += RenderChannelImOrGroupNameChangedText;
+        }
+
+        private void RenderChannelImOrGroupNameChangedText(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            var reg = new Regex("([#,@])(.*)");
+            var text = reg.Match(textBox.Text).Groups[2].Value;
+
+            var bb = text;
+
+            //var channelsNames = Slack.Components.Channels.Select(x => x.ChannelName).ToList();
+
+            //var channels =
+            //    channelsNames.Where(
+            //        x => x.StartsWith(text, StringComparison.InvariantCultureIgnoreCase));
         }
 
         internal void AddOrRemoveChildren(StackPanel stackPanelNotificationArea, Message message)
@@ -71,42 +88,42 @@ namespace SlackDesktopBubbleApplication
 
         internal void GetAndDisplayMessages(Func<Message, Action> action)
         {
-            while (true) //TODO: STACKOVERFLOW EXCEPTION ACCURS BY USING SAME METHOD AGAIN
+            while (true)
             {
                 try
                 {
-                    var messages = this.IsTestMode ? MockMessages.GetMockMessages() : Slack.GetMessages();
+                    var messages = Slack.GetMessages();
 
                     foreach (var message in messages)
                     {
                         action.Invoke(message);
                     }
                 }
-                catch (SlackApiHelpereException ex)
+                catch (SlackApiException ex)
                 {
-                    if (!this.HasAnyExceptions)
+                    if (!this._hasAnyExceptions)
                     {
                         MessageHelper.AddMessage(action,
                             $"Error: {ex.Message}", "system");
-
-                        ExceptionLogging.Trace(ex);
                     }
 
-                    this.HasAnyExceptions = true;
+                    ExceptionLogging.Trace(ex);
+
+                    this._hasAnyExceptions = true;
 
                     this.ClearNotificationAreaTimer.Stop();
                 }
                 catch (Exception ex)
                 {
-                    if (!this.HasAnyExceptions)
+                    if (!this._hasAnyExceptions)
                     {
                         MessageHelper.AddMessage(action,
-                            $"Error: {ex.Message}", "system");
-
-                        ExceptionLogging.Trace(ex);
+                            $"Error: {ex.Message}", "system");       
                     }
 
-                    this.HasAnyExceptions = true;
+                    ExceptionLogging.Trace(ex);
+
+                    this._hasAnyExceptions = true;
 
                     this.ClearNotificationAreaTimer.Stop();
                 }
@@ -116,20 +133,17 @@ namespace SlackDesktopBubbleApplication
         internal bool IsSlackInitialized()
         {
             string token = RegistryUtility.Read("MyToken");
-
+            
             var init = Slack.Initialize(token);
+            if (init == null)
+            {
+               throw new SlackApiException("Initialization failed.");
+            }
 
-            bool hasInitSuccess = init.Result.IsSuccess;
+            bool hasInitSuccess = init.IsSuccess;
             if (!hasInitSuccess)
             {
-                string messageText =
-                    $"Error: {init.Result.Message}\nSolution: {init.ResponseError.SolutionMessage}";
-
-                MessageHelper.AddMessage(this.AddOrRemoveMessages, messageText, "system");
-
-                //TODO: START RED LINE BLINK
-
-                return false;
+                throw new SlackApiException("Initialization failed.");
             }
 
             return true;
@@ -137,26 +151,26 @@ namespace SlackDesktopBubbleApplication
 
         internal void SetColorsOnSlackSharpIcon()
         {
-            this.SlackLineGreen.Background = SolidColorBrushUtility.SlackGreen;
-            this.SlackLineYellow.Background = SolidColorBrushUtility.SlackYellow;
-            this.SlackLineBlue.Background = SolidColorBrushUtility.SlackBlue;
-            this.SlackLineRed.Background = SolidColorBrushUtility.SlackRed;
+            this.SlackLineGreen.Background = SolidColorBrushHelper.SlackGreen;
+            this.SlackLineYellow.Background = SolidColorBrushHelper.SlackYellow;
+            this.SlackLineBlue.Background = SolidColorBrushHelper.SlackBlue;
+            this.SlackLineRed.Background = SolidColorBrushHelper.SlackRed;
         }
 
         internal void SetInactiveColorsOnSlackShartIcon()
         {
-            this.SlackLineGreen.Background = SolidColorBrushUtility.SlackDarkBlue;
-            this.SlackLineYellow.Background = SolidColorBrushUtility.SlackDarkBlue;
-            this.SlackLineBlue.Background = SolidColorBrushUtility.SlackDarkBlue;
-            this.SlackLineRed.Background = SolidColorBrushUtility.SlackDarkBlue;
+            this.SlackLineGreen.Background = SolidColorBrushHelper.SlackDarkBlue;
+            this.SlackLineYellow.Background = SolidColorBrushHelper.SlackDarkBlue;
+            this.SlackLineBlue.Background = SolidColorBrushHelper.SlackDarkBlue;
+            this.SlackLineRed.Background = SolidColorBrushHelper.SlackDarkBlue;
         }
 
         internal void UnSetColorsOnSlackSharpIcon()
         {
-            this.SlackLineGreen.Background = SolidColorBrushUtility.AliceBlue;
-            this.SlackLineYellow.Background = SolidColorBrushUtility.AliceBlue;
-            this.SlackLineBlue.Background = SolidColorBrushUtility.AliceBlue;
-            this.SlackLineRed.Background = SolidColorBrushUtility.AliceBlue;
+            this.SlackLineGreen.Background = SolidColorBrushHelper.AliceBlue;
+            this.SlackLineYellow.Background = SolidColorBrushHelper.AliceBlue;
+            this.SlackLineBlue.Background = SolidColorBrushHelper.AliceBlue;
+            this.SlackLineRed.Background = SolidColorBrushHelper.AliceBlue;
         }
 
         //internal void SetWarningColorsOnSlackSharpIcon()
@@ -223,11 +237,12 @@ namespace SlackDesktopBubbleApplication
 
         private void GridMainIcon_MouseLeave(object sender, MouseEventArgs e)
         {
+            //TODO: FIND BETTER LOGIC AS MANY MOUSE OVER HIDES MENU WHEN IT'S NOT A TIME
             var thread = new Thread(() =>
             {
                 Thread.Sleep(3000);
 
-                Dispatcher.Invoke(DispatcherPriority.Normal,
+                this.Dispatcher.Invoke(DispatcherPriority.Normal,
                     new Action<StackPanel>(this.SetVisibilityHidden),
                     this.StackPanelControlls);
             });
@@ -266,16 +281,17 @@ namespace SlackDesktopBubbleApplication
 
             if (e.RightButton == MouseButtonState.Pressed)
             {
-                MessageHelper.AddMessage(this.AddOrRemoveMessages, $"You are logged in as: @{Slack.MyPofile.UserName}", "system");
+                MessageHelper.AddMessage(this._addOrRemoveMessages, $"You are logged in as: @{Slack.Components?.Profile?.UserName}",
+                    "system");
             }
 
             if (e.ChangedButton == MouseButton.Left)
             {
                 if (e.ClickCount >= 2)
                 {
-                    this.HasAnyExceptions = false;
+                    this._hasAnyExceptions = false;
 
-                    MessageHelper.AddMessage(this.AddOrRemoveMessages, "Bubble has been restarted.", "system");
+                    MessageHelper.AddMessage(this._addOrRemoveMessages, "Bubble has been restarted.", "system");
 
                     this.ClearNotificationAreaTimer.Start();
                 }
@@ -301,7 +317,7 @@ namespace SlackDesktopBubbleApplication
                     return;
                 }
 
-                var thread = new Thread(() => this.GetAndDisplayMessages(this.AddOrRemoveMessages));
+                var thread = new Thread(() => this.GetAndDisplayMessages(this._addOrRemoveMessages));
                 thread.Start();
 
                 this.ClearNotificationAreaTimer?.Start();
@@ -310,12 +326,65 @@ namespace SlackDesktopBubbleApplication
             {
                 ExceptionLogging.Trace(ex);
 
-                MessageHelper.AddMessage(this.AddOrRemoveMessages, $"Error: {ex.Message}", "system");
+                MessageHelper.AddMessage(this._addOrRemoveMessages, $"Error: {ex.Message}", "system");
             }
             finally
             {
                 this.SetInactiveColorsOnSlackShartIcon();
             }
+        }
+
+        private void TextBoxChannelGroupImName_KeyUp(object sender, KeyEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            return;
+
+            string name = this.TextBoxChannelGroupImName.Text;
+            if (string.IsNullOrWhiteSpace(name) && name.Length < 3)
+            {
+                return;
+            }
+
+            //string tempName = name;
+
+            //if (!string.IsNullOrWhiteSpace(name))
+            //{
+            //    tempName = name.Replace("#", string.Empty).Replace("@", string.Empty);
+            //}
+
+            var channelsNames = Slack.Components.Channels.Select(x => x.ChannelName).ToList();
+
+            var channels =
+                channelsNames.Where(
+                    x => x.StartsWith(name, StringComparison.InvariantCultureIgnoreCase));
+
+            if (channels.Count() > 1)
+            {
+                return;
+            }
+
+            if (channels.Count() == 1)
+            {
+                textBox.Text = $"#{channels.SingleOrDefault()}";
+            }
+        }
+
+        private void TextBoxChannelGroupImName_KeyDown(object sender, KeyEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            var reg = new Regex("([#,@])(.*)");
+            var text = reg.Match(textBox.Text).Groups[2].Value;
+
+            //var channelsNames = Slack.Components.Channels.Select(x => x.ChannelName).ToList();
+
+            //var channels =
+            //    channelsNames.Where(
+            //        x => x.StartsWith(text, StringComparison.InvariantCultureIgnoreCase));
+
+
+            return;
         }
     }
 }

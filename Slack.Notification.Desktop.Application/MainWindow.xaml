@@ -9,25 +9,25 @@
         WindowStyle="None" 
         ResizeMode="NoResize" 
         Topmost="True"
-        Title="MainWindow" Height="500" Width="300" ContentRendered="Window_ContentRendered">
+        Title="MainWindow" Height="500" Width="500" ContentRendered="Window_ContentRendered">
 
     <Window.Background>
         <SolidColorBrush Opacity="0" Color="White"/>
     </Window.Background>
 
     <Grid Margin="0">
-        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0">
+        <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="0">
             <StackPanel x:Name="NotificationArea"
                         Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
 
 
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal" Margin="0">
 
-                <Grid Margin="0,0,130,0">
-                    <TextBlock Text="Message here" Foreground="#FFF7F4F4" Visibility="Hidden"/>
+                <Grid Margin="0" RenderTransformOrigin="0.5,0.5" Width="420">
+                    <TextBox x:Name="TextBoxMessageText" HorizontalAlignment="Left" Height="23" Margin="82,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <TextBox x:Name="TextBoxChannelGroupImName" HorizontalAlignment="Left" Height="23" Margin="10,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="67"/>
                 </Grid>
-
-                <Grid x:Name="GridMainIcon" VerticalAlignment="Bottom" Margin="0" MouseEnter="GridMainIcon_MouseEnter" MouseLeave="GridMainIcon_MouseLeave">
+                <Grid x:Name="GridMainIcon" VerticalAlignment="Bottom" Margin="0" MouseEnter="GridMainIcon_MouseEnter" MouseLeave="GridMainIcon_MouseLeave" HorizontalAlignment="Right">
                     <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="80">
 
                         <Grid x:Name="MainIconArea"  Cursor="Hand" Margin="0">
