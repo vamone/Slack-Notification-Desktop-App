@@ -23,12 +23,12 @@ namespace Slack.Api
 
             string json = WebRequestUtility.GetContent(url.Auth);
 
-            var auth = GetAuthResponseInternal(json);
+            var auth = GetAuthResponseFromJson(json);
 
             return auth;
         }
 
-        internal static AuthResponse GetAuthResponseInternal(string json)
+        public static AuthResponse GetAuthResponseFromJson(string json)
         {
             if (json == null)
             {

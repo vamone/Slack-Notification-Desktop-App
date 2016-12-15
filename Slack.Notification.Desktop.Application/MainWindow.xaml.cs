@@ -17,9 +17,9 @@ namespace SlackDesktopBubbleApplication
     {
         internal DispatcherTimer ClearNotificationAreaTimer;
 
-        static readonly Lazy<SlackApi> SlackLazy = new Lazy<SlackApi>();
+        static readonly Lazy<MockSlackApi> SlackLazy = new Lazy<MockSlackApi>();
 
-        static SlackApi Slack => SlackLazy.Value;
+        static ISlackApi Slack => SlackLazy.Value;
 
         private readonly Func<Message, Action> _addOrRemoveMessages;
 

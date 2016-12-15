@@ -8,5 +8,10 @@ namespace Slack.Api
         {
             return new List<Bot>();
         }
+
+        public static ICollection<Bot> GetBotsFromJson(string json = null)
+        {
+            return new List<Bot>();
+        } 
     }
 }

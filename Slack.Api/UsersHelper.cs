@@ -13,12 +13,12 @@ namespace Slack.Api
 
             string json = WebRequestUtility.GetContent(url.UsersList);
 
-            var users = GetUsersInternal(json);
+            var users = GetUsersFromJson(json);
 
             return users;
         }
 
-        public static ICollection<User> GetUsersInternal(string json)
+        public static ICollection<User> GetUsersFromJson(string json)
         {
             var content = JsonUtility.ConvertJsonIntoObject<UserParent>(json);
             if (content == null)

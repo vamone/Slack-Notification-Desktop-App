@@ -23,12 +23,12 @@ namespace Slack.Api
 
             string json = WebRequestUtility.GetContent(url.ImsList);
 
-            var ims = GetImsInternal(json);
+            var ims = GetImsFromJson(json);
 
             return ims;
         }
 
-        internal static ICollection<Im> GetImsInternal(string json)
+        public static ICollection<Im> GetImsFromJson(string json)
         {
             if (json == null)
             {
