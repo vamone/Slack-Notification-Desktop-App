@@ -5,7 +5,7 @@ using Slack.Intelligence;
 
 namespace Slack.Api
 {
-    public class AuthHelper
+    public static class AuthHelper
     {
         public static AuthResponse GetAuthResponse(string token)
         {
@@ -19,9 +19,9 @@ namespace Slack.Api
                 throw new ArgumentException(nameof(token));
             }
 
-            var url = RequestUrlFactory.BuildUrl(RequestUrlFactory.AuthTestUrl, token);
+            var url = new RequestUrlFactory(token);
 
-            string json = WebRequestUtility.GetContent(url);
+            string json = WebRequestUtility.GetContent(url.Auth);
 
             var auth = GetAuthResponseInternal(json);
 

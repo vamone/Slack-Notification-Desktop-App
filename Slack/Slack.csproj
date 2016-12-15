@@ -45,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthResponse.cs" />
-    <Compile Include="AuthResponseError.cs" />
     <Compile Include="Bot.cs" />
     <Compile Include="Channel.cs" />
     <Compile Include="ChannelParent.cs" />

@@ -105,9 +105,9 @@ namespace SlackDesktopBubbleApplication
                     {
                         MessageHelper.AddMessage(action,
                             $"Error: {ex.Message}", "system");
-
-                        ExceptionLogging.Trace(ex);
                     }
+
+                    ExceptionLogging.Trace(ex);
 
                     this._hasAnyExceptions = true;
 
@@ -118,10 +118,10 @@ namespace SlackDesktopBubbleApplication
                     if (!this._hasAnyExceptions)
                     {
                         MessageHelper.AddMessage(action,
-                            $"Error: {ex.Message}", "system");
-
-                        ExceptionLogging.Trace(ex);
+                            $"Error: {ex.Message}", "system");       
                     }
+
+                    ExceptionLogging.Trace(ex);
 
                     this._hasAnyExceptions = true;
 
@@ -137,25 +137,13 @@ namespace SlackDesktopBubbleApplication
             var init = Slack.Initialize(token);
             if (init == null)
             {
-                string messageText =
-                    $"Error: Initialization failed.";
-
-                MessageHelper.AddMessage(this._addOrRemoveMessages, messageText, "system");
-
-                return false;
+               throw new SlackApiException("Initialization failed.");
             }
 
             bool hasInitSuccess = init.IsSuccess;
             if (!hasInitSuccess)
             {
-                string messageText =
-                    $"Error: {init.Message}";
-
-                MessageHelper.AddMessage(this._addOrRemoveMessages, messageText, "system");
-
-                //TODO: START RED LINE BLINK
-
-                return false;
+                throw new SlackApiException("Initialization failed.");
             }
 
             return true;

@@ -5,13 +5,13 @@ using Slack.Intelligence;
 
 namespace Slack.Api
 {
-    public class ChannelHelper
+    public static class ChannelHelper
     {
         public static ICollection<Channel> GetChannels(string token)
         {
-            var url = RequestUrlFactory.BuildUrl(RequestUrlFactory.ChannelsListUrl, token);
+            var url = new RequestUrlFactory(token);
 
-            string json = WebRequestUtility.GetContent(url);
+            string json = WebRequestUtility.GetContent(url.ChannelsList);
 
             var auth = GetChannelsInternal(json);
 

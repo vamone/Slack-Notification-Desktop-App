@@ -46,16 +46,18 @@
   <ItemGroup>
     <Compile Include="AuthErrorsAndWarnings.cs" />
     <Compile Include="AuthHelper.cs" />
+    <Compile Include="AuthResponseError.cs" />
     <Compile Include="BotsHelper.cs" />
     <Compile Include="ChannelHelper.cs" />
     <Compile Include="Components.cs" />
     <Compile Include="ImHelper.cs" />
     <Compile Include="InitializationResult.cs" />
     <Compile Include="ISlackApi.cs" />
+    <Compile Include="MessageHelper.cs" />
     <Compile Include="MockMessages.cs" />
     <Compile Include="ProfileHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RequestUrls.cs" />
+    <Compile Include="RequestUrlFactory.cs" />
     <Compile Include="SlackApi.cs" />
     <Compile Include="SlackApiException.cs" />
     <Compile Include="UsersHelper.cs" />

@@ -5,13 +5,13 @@ using Slack.Intelligence;
 
 namespace Slack.Api
 {
-    public class UserHelper
+    public static class UserHelper
     {
         public static ICollection<User> GetUsers(string token)
         {
-            var url = RequestUrlFactory.BuildUrl(RequestUrlFactory.UserListUrl, token);
+            var url = new RequestUrlFactory(token);
 
-            string json = WebRequestUtility.GetContent(url);
+            string json = WebRequestUtility.GetContent(url.UsersList);
 
             var users = GetUsersInternal(json);
 

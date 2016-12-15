@@ -5,7 +5,7 @@ using Slack.Intelligence;
 
 namespace Slack.Api
 {
-    public class ImHelper
+    public static class ImHelper
     {
         public static ICollection<Im> GetIms(string token)
         {
@@ -19,9 +19,9 @@ namespace Slack.Api
                 throw new ArgumentException(nameof(token));
             }
 
-            var url = RequestUrlFactory.BuildUrl(RequestUrlFactory.ImListUrl, token);
+            var url = new RequestUrlFactory(token);
 
-            string json = WebRequestUtility.GetContent(url);
+            string json = WebRequestUtility.GetContent(url.ImsList);
 
             var ims = GetImsInternal(json);
 

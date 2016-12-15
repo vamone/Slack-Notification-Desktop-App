@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Slack.Api
 {
-    public class ProfileHelper
+    public static class ProfileHelper
     {
         public static User GetProfile(ICollection<User> users, string userId)
         {

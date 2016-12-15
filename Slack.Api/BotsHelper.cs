@@ -2,7 +2,7 @@
 
 namespace Slack.Api
 {
-    public class BotsHelper
+    public static class BotsHelper
     {
         public static ICollection<Bot> GetBots(string token)
         {
