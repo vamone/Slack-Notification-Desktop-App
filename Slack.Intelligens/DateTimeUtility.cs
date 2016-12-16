@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace Slack.Intelligence
 {
@@ -7,16 +6,16 @@ namespace Slack.Intelligence
     {
         public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
-            var dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            var dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified);
             dateTime = dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
 
             return dateTime;
         }
 
-        public static double DateTimeToUnixTimestamp(DateTime dateTime)
+        public static int DateTimeToUnixTimestamp(DateTime dateTime)
         {
             var timestamp = (TimeZoneInfo.ConvertTimeToUtc(dateTime) -
-                    new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+                             new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified)).Seconds;
 
             return timestamp;
         }

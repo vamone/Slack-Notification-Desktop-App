@@ -23,7 +23,7 @@
 
             <StackPanel Orientation="Horizontal" Margin="0">
 
-                <Grid Margin="0" RenderTransformOrigin="0.5,0.5" Width="420">
+                <Grid Margin="0" RenderTransformOrigin="0.5,0.5" Width="420" Visibility="Hidden">
                     <TextBox x:Name="TextBoxMessageText" HorizontalAlignment="Left" Height="23" Margin="82,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" KeyUp="TextBoxMessageText_KeyUp"/>
                     <TextBox x:Name="TextBoxChannelGroupImName" HorizontalAlignment="Left" Height="23" Margin="10,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="67"/>
                     <Button x:Name="ButtonSendMessage" Content="Button" HorizontalAlignment="Left" Margin="207,40,0,0" VerticalAlignment="Top" Width="75" Click="ButtonSendMessage_Click"/>
@@ -54,7 +54,7 @@
 
                         <StackPanel x:Name="StackPanelControlls" Orientation="Horizontal">
                             <Grid x:Name="GridOpenMessageMenu"  Cursor="Hand" Width="20" Height="20" MouseDown="GridOpenMessageMenu_MouseDown" Margin="0,0,30,0">
-                                <Ellipse Fill="#FF050505" Opacity="0.5" />
+                                <Ellipse Fill="#FF050505" Opacity="0.5" Visibility="Hidden" />
                                 <Path Data="M12.099998,0L19.799995,0 19.799995,12.1 32,12.1 32,19.799996 19.900002,19.799996 19.900002,31.999999 12.199997,31.999999 12.199997,19.900003 0,19.900003 0,12.199999 12.099998,12.199999z" 
                               Stretch="Uniform" Fill="#FFFFFFFF" 
                               Opacity="0.7" 

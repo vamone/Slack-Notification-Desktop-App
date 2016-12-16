@@ -173,7 +173,7 @@ namespace SlackDesktopBubbleApplication
 
             foreach (var element in elements)
             {
-                double messageTimestamp = Convert.ToDouble(element.Uid); //TODO: CAN NOT CONVERT 1481889334.00001
+                double messageTimestamp = Convert.ToInt32(element.Uid); //TODO: CAN NOT CONVERT 1481889334.00001
 
                 var messageAddedAt = DateTimeUtility.UnixTimeStampToDateTime(messageTimestamp);
 

@@ -56,7 +56,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DateTimeUtilityTests.cs" />
     <Compile Include="SlackApiTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -67,6 +66,10 @@
     <ProjectReference Include="..\Slack.Api\Slack.Api.csproj">
       <Project>{ECA48666-1F8C-4A86-A2CC-127056B21A94}</Project>
       <Name>Slack.Api</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Slack.Intelligens\Slack.Intelligence.csproj">
+      <Project>{EC342735-A58C-4150-A465-C1FC39906305}</Project>
+      <Name>Slack.Intelligence</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

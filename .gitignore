@@ -155,3 +155,8 @@ SlackApiTests/bin/
 Slack.Notification.Desktop.Application/bin/
 Slack.Notification.Desktop.Application/obj/
 Slack.Notification.Console.Application/bin/
+Slack.Intelligens/bin/
+Slack/obj/
+Slack/bin/
+Slack.Intelligens/obj/
+Slack.Notification.Console.Application/obj/

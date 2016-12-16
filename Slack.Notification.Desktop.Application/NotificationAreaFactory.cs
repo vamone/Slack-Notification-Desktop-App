@@ -73,7 +73,7 @@ namespace SlackDesktopBubbleApplication
                 Opacity = 0.70,
                 CornerRadius = new CornerRadius(10, 10, 10, 10),
                 Margin = new Thickness {Left = 5, Top = 5, Right = 5, Bottom = 5},
-                Uid = timestamp.ToString(CultureInfo.InvariantCulture),
+                Uid = $"{timestamp}",
                 Child = grid
             };
 

@@ -44,7 +44,7 @@ namespace Slack.Api
                 throw new ArgumentNullException(nameof(message));
             }
 
-            if (string.IsNullOrWhiteSpace(message?.MessageText))
+            if (string.IsNullOrWhiteSpace(message.MessageText))
             {
                 return false;
             }
