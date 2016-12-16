@@ -9,7 +9,7 @@
         WindowStyle="None" 
         ResizeMode="NoResize" 
         Topmost="True"
-        Title="MainWindow" Height="500" Width="500" ContentRendered="Window_ContentRendered">
+        Title="MainWindow" Height="500" Width="500" Loaded="Window_Loaded">
 
     <Window.Background>
         <SolidColorBrush Opacity="0" Color="White"/>
@@ -24,8 +24,9 @@
             <StackPanel Orientation="Horizontal" Margin="0">
 
                 <Grid Margin="0" RenderTransformOrigin="0.5,0.5" Width="420">
-                    <TextBox x:Name="TextBoxMessageText" HorizontalAlignment="Left" Height="23" Margin="82,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+                    <TextBox x:Name="TextBoxMessageText" HorizontalAlignment="Left" Height="23" Margin="82,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" KeyUp="TextBoxMessageText_KeyUp"/>
                     <TextBox x:Name="TextBoxChannelGroupImName" HorizontalAlignment="Left" Height="23" Margin="10,40,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="67"/>
+                    <Button x:Name="ButtonSendMessage" Content="Button" HorizontalAlignment="Left" Margin="207,40,0,0" VerticalAlignment="Top" Width="75" Click="ButtonSendMessage_Click"/>
                 </Grid>
                 <Grid x:Name="GridMainIcon" VerticalAlignment="Bottom" Margin="0" MouseEnter="GridMainIcon_MouseEnter" MouseLeave="GridMainIcon_MouseLeave" HorizontalAlignment="Right">
                     <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right" Width="80">

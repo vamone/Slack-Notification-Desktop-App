@@ -97,7 +97,13 @@ namespace Slack.Api
 
         public void SendMessage(Message message)
         {
-            message.Validate();
+            //message.Validate();
+
+            bool isSended = MessageHelper.IsMessageSended(message, this.Token);
+            if (!isSended)
+            {
+                throw new SlackApiException("Could not send message.");
+            }
         }
 
         internal bool IsMessageVisible(Message message)

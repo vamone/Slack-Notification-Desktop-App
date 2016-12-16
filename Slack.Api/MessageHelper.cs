@@ -109,5 +109,32 @@ namespace Slack.Api
 
             return message;
         }
+
+        public static bool IsMessageSended(Message message, string token)
+        {
+            string url =
+                new RequestUrlFactory(token, message.ChannelId, message.MessageText, message.UserId).SendMessage;
+
+            string json = WebRequestUtility.GetContent(url);
+
+            return IsMessagesSendedFromJson(json);
+        }
+
+        public static bool IsMessagesSendedFromJson(string json)
+        {
+            var content = JsonUtility.ConvertJsonIntoObject<MessageSendResponse>(json);
+            if (content == null)
+            {
+                return false;
+            }
+
+            bool isStatusOk = content.IsStatusOk;
+            if (!isStatusOk)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

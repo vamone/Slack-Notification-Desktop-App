@@ -43,26 +43,9 @@ namespace SlackDesktopBubbleApplication
             this.ClearNotificationAreaTimer = new DispatcherTimer();
             this.ClearNotificationAreaTimer.Tick += ClearNotificationsTimerEventProcessor;
             this.ClearNotificationAreaTimer.Interval = new TimeSpan(0, 0, 5);
-
-            this.TextBoxChannelGroupImName.TextChanged += RenderChannelImOrGroupNameChangedText;
         }
 
-        private void RenderChannelImOrGroupNameChangedText(object sender, TextChangedEventArgs e)
-        {
-            var textBox = sender as TextBox;
-
-            var reg = new Regex("([#,@])(.*)");
-            var text = reg.Match(textBox.Text).Groups[2].Value;
-
-            var bb = text;
-
-            //var channelsNames = Slack.Components.Channels.Select(x => x.ChannelName).ToList();
-
-            //var channels =
-            //    channelsNames.Where(
-            //        x => x.StartsWith(text, StringComparison.InvariantCultureIgnoreCase));
-        }
-
+        //TODO: FIX HEIGHT
         internal void AddOrRemoveChildren(StackPanel stackPanelNotificationArea, Message message)
         {
             this.SetColorsOnSlackSharpIcon();
@@ -88,7 +71,7 @@ namespace SlackDesktopBubbleApplication
 
         internal void GetAndDisplayMessages(Func<Message, Action> action)
         {
-            while (true)
+            while (!this._hasAnyExceptions)
             {
                 try
                 {
@@ -99,27 +82,10 @@ namespace SlackDesktopBubbleApplication
                         action.Invoke(message);
                     }
                 }
-                catch (SlackApiException ex)
-                {
-                    if (!this._hasAnyExceptions)
-                    {
-                        MessageHelper.AddMessage(action,
-                            $"Error: {ex.Message}", "system");
-                    }
-
-                    ExceptionLogging.Trace(ex);
-
-                    this._hasAnyExceptions = true;
-
-                    this.ClearNotificationAreaTimer.Stop();
-                }
                 catch (Exception ex)
                 {
-                    if (!this._hasAnyExceptions)
-                    {
-                        MessageHelper.AddMessage(action,
-                            $"Error: {ex.Message}", "system");       
-                    }
+                    MessageHelper.AddMessage(action,
+                        $"Error: {ex.Message}", "system");
 
                     ExceptionLogging.Trace(ex);
 
@@ -133,11 +99,11 @@ namespace SlackDesktopBubbleApplication
         internal bool IsSlackInitialized()
         {
             string token = RegistryUtility.Read("MyToken");
-            
+
             var init = Slack.Initialize(token);
             if (init == null)
             {
-               throw new SlackApiException("Initialization failed.");
+                throw new SlackApiException("Initialization failed.");
             }
 
             bool hasInitSuccess = init.IsSuccess;
@@ -281,7 +247,8 @@ namespace SlackDesktopBubbleApplication
 
             if (e.RightButton == MouseButtonState.Pressed)
             {
-                MessageHelper.AddMessage(this._addOrRemoveMessages, $"You are logged in as: @{Slack.Components?.Profile?.UserName}",
+                MessageHelper.AddMessage(this._addOrRemoveMessages,
+                    $"You are logged in as: @{Slack.Components?.Profile?.UserName}",
                     "system");
             }
 
@@ -305,33 +272,6 @@ namespace SlackDesktopBubbleApplication
         private void SetVisibilityHidden(StackPanel stackPanel)
         {
             stackPanel.Visibility = Visibility.Hidden;
-        }
-
-        private void Window_ContentRendered(object sender, EventArgs e)
-        {
-            try
-            {
-                bool isSlackInitilized = this.IsSlackInitialized();
-                if (!isSlackInitilized)
-                {
-                    return;
-                }
-
-                var thread = new Thread(() => this.GetAndDisplayMessages(this._addOrRemoveMessages));
-                thread.Start();
-
-                this.ClearNotificationAreaTimer?.Start();
-            }
-            catch (Exception ex)
-            {
-                ExceptionLogging.Trace(ex);
-
-                MessageHelper.AddMessage(this._addOrRemoveMessages, $"Error: {ex.Message}", "system");
-            }
-            finally
-            {
-                this.SetInactiveColorsOnSlackShartIcon();
-            }
         }
 
         private void TextBoxChannelGroupImName_KeyUp(object sender, KeyEventArgs e)
@@ -372,10 +312,10 @@ namespace SlackDesktopBubbleApplication
 
         private void TextBoxChannelGroupImName_KeyDown(object sender, KeyEventArgs e)
         {
-            var textBox = sender as TextBox;
+            //string channelOrImName = this.TextBoxChannelGroupImName.Text;
 
-            var reg = new Regex("([#,@])(.*)");
-            var text = reg.Match(textBox.Text).Groups[2].Value;
+            //var reg = new Regex("([#,@])(.*)");
+            //var text = reg.Match(channelOrImName).Groups[2].Value;
 
             //var channelsNames = Slack.Components.Channels.Select(x => x.ChannelName).ToList();
 
@@ -385,6 +325,59 @@ namespace SlackDesktopBubbleApplication
 
 
             return;
+        }
+
+        private void TextBoxMessageText_KeyUp(object sender, KeyEventArgs e)
+        {
+            
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                bool isSlackInitilized = this.IsSlackInitialized();
+                if (!isSlackInitilized)
+                {
+                    return;
+                }
+
+                var thread = new Thread(() => this.GetAndDisplayMessages(this._addOrRemoveMessages));
+                thread.Start();
+
+                this.ClearNotificationAreaTimer?.Start();
+            }
+            catch (Exception ex)
+            {
+                ExceptionLogging.Trace(ex);
+
+                MessageHelper.AddMessage(this._addOrRemoveMessages, $"Error: {ex.Message}", "system");
+            }
+            finally
+            {
+                this.SetInactiveColorsOnSlackShartIcon();
+            }
+        }
+
+        private void ButtonSendMessage_Click(object sender, RoutedEventArgs e)
+        {
+            string messageText = this.TextBoxMessageText.Text;
+
+            if (string.IsNullOrWhiteSpace(messageText))
+            {
+                return;
+            }
+
+            this.TextBoxMessageText.Clear();
+
+            var message = new Message
+            {
+                ChannelId = "C054QQB3C",
+                UserId = Slack.Components?.Profile?.UserId,
+                MessageText = messageText
+            };
+
+            Slack.SendMessage(message);
         }
     }
 }
