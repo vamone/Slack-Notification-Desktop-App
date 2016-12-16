@@ -18,7 +18,7 @@
     <Grid Margin="0">
         <StackPanel Orientation="Vertical" VerticalAlignment="Bottom" Margin="0">
             <StackPanel x:Name="NotificationArea"
-                        Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right"/>
+                        Orientation="Vertical" VerticalAlignment="Bottom" HorizontalAlignment="Right" Margin="0,0,0,10"/>
 
 
             <StackPanel Orientation="Horizontal" Margin="0">

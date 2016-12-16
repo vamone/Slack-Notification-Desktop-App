@@ -30,6 +30,8 @@ namespace Slack.Api
                     throw new SlackApiException(nameof(token));
                 }
 
+                //TODO: WHEN NO JSON FILES EXISTS, WHAT TO DO?
+
                 string authJson = JsonUtility.ReadJsonFromFile(fileName: "auth");
                 string usersJson = JsonUtility.ReadJsonFromFile(fileName: "users");
                 string channelsJson = JsonUtility.ReadJsonFromFile(fileName: "channels");

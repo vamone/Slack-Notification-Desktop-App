@@ -17,7 +17,7 @@ namespace SlackDesktopBubbleApplication
     {
         internal DispatcherTimer ClearNotificationAreaTimer;
 
-        static readonly Lazy<MockSlackApi> SlackLazy = new Lazy<MockSlackApi>();
+        static readonly Lazy<SlackApi> SlackLazy = new Lazy<SlackApi>();
 
         static ISlackApi Slack => SlackLazy.Value;
 
@@ -143,7 +143,7 @@ namespace SlackDesktopBubbleApplication
             bool hasInitSuccess = init.IsSuccess;
             if (!hasInitSuccess)
             {
-                throw new SlackApiException("Initialization failed.");
+                throw new SlackApiException(init.Message);
             }
 
             return true;
@@ -207,7 +207,7 @@ namespace SlackDesktopBubbleApplication
 
             foreach (var element in elements)
             {
-                double messageTimestamp = Convert.ToDouble(element.Uid);
+                double messageTimestamp = Convert.ToDouble(element.Uid); //TODO: CAN NOT CONVERT 1481889334.00001
 
                 var messageAddedAt = DateTimeUtility.UnixTimeStampToDateTime(messageTimestamp);
 
