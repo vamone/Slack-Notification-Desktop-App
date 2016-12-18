@@ -8,6 +8,8 @@ namespace Slack.Api
     {
         public SlackApi()
         {
+            this.IsMock = false;
+
             this.LastMessageAt = DateTime.Now;
         }
 
@@ -18,6 +20,8 @@ namespace Slack.Api
         private string ProfileId { get; set; }
 
         private DateTime LastMessageAt { get; set; }
+
+        public bool IsMock { get; set; }
 
         public IEnumerable<Message> GetMessages()
         {

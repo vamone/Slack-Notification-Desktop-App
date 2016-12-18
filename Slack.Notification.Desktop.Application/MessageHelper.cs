@@ -1,9 +1,7 @@
 ﻿using System;
-
-using Slack;
 using Slack.Intelligence;
 
-namespace SlackDesktopBubbleApplication
+namespace Slack.Desktop.Application
 {
     public class MessageHelper
     {

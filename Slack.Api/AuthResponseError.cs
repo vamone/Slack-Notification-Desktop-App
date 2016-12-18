@@ -1,4 +1,4 @@
-﻿namespace Slack
+﻿namespace Slack.Api
 {
     public class AuthResponseError
     {

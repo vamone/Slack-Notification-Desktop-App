@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace SlackDesktopBubbleApplication.Properties
+namespace Slack.Desktop.Application.Updater.Properties
 {
 
 

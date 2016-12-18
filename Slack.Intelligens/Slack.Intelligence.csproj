@@ -57,13 +57,13 @@
     <Compile Include="WebRequestUtility.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Slack\Slack.csproj">
       <Project>{9b8d0e0a-bc01-4563-9089-bb10e7232132}</Project>
       <Name>Slack</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

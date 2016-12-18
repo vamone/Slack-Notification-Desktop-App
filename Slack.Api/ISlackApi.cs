@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Slack.Api
 {
@@ -12,5 +11,7 @@ namespace Slack.Api
         void SendMessage(Message message);
 
         IEnumerable<Message> GetMessages();
+        
+        bool IsMock { get; set; }
     }
 }

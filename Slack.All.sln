@@ -7,9 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack", "Slack\Slack.csproj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Intelligence", "Slack.Intelligens\Slack.Intelligence.csproj", "{EC342735-A58C-4150-A465-C1FC39906305}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Notification.Desktop.Application", "Slack.Notification.Desktop.Application\Slack.Notification.Desktop.Application.csproj", "{AA90A7AD-014F-4F2B-8716-A6572B11213B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Desktop.Application", "Slack.Notification.Desktop.Application\Slack.Desktop.Application.csproj", "{AA90A7AD-014F-4F2B-8716-A6572B11213B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Notification.Console.Application", "Slack.Notification.Console.Application\Slack.Notification.Console.Application.csproj", "{18587AC5-7261-4ADE-8387-4635123FFD45}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Console.Application", "Slack.Notification.Console.Application\Slack.Console.Application.csproj", "{18587AC5-7261-4ADE-8387-4635123FFD45}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{08898956-6413-45DA-AE17-E48BB4EE5498}"
 EndProject
@@ -18,6 +18,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Api.Test", "SlackApiTests\Slack.Api.Test.csproj", "{F6B04CD9-8E3B-46C5-A574-6C9B9F328F23}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Api", "Slack.Api\Slack.Api.csproj", "{ECA48666-1F8C-4A86-A2CC-127056B21A94}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slack.Desktop.Application.Updater", "Slack.Desktop.Application.Updater\Slack.Desktop.Application.Updater.csproj", "{078DECA4-5813-4D6A-8219-8BD703D15AAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +51,10 @@ Global
 		{ECA48666-1F8C-4A86-A2CC-127056B21A94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ECA48666-1F8C-4A86-A2CC-127056B21A94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ECA48666-1F8C-4A86-A2CC-127056B21A94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{078DECA4-5813-4D6A-8219-8BD703D15AAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{078DECA4-5813-4D6A-8219-8BD703D15AAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{078DECA4-5813-4D6A-8219-8BD703D15AAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{078DECA4-5813-4D6A-8219-8BD703D15AAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,5 +66,6 @@ Global
 		{18587AC5-7261-4ADE-8387-4635123FFD45} = {08898956-6413-45DA-AE17-E48BB4EE5498}
 		{F6B04CD9-8E3B-46C5-A574-6C9B9F328F23} = {4F5A1273-48AC-42BE-8AA7-8A33D944362E}
 		{ECA48666-1F8C-4A86-A2CC-127056B21A94} = {08898956-6413-45DA-AE17-E48BB4EE5498}
+		{078DECA4-5813-4D6A-8219-8BD703D15AAF} = {08898956-6413-45DA-AE17-E48BB4EE5498}
 	EndGlobalSection
 EndGlobal

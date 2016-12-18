@@ -1,29 +1,35 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
 
-using Slack;
 using Slack.Api;
+using Slack.Desktop.Application.Updater;
 using Slack.Intelligence;
 
-namespace SlackDesktopBubbleApplication
+namespace Slack.Desktop.Application
 {
-    public partial class MainWindow
+    public partial class MainWindow : Window
     {
-        internal DispatcherTimer ClearNotificationAreaTimer;
+        private DispatcherTimer ClearNotificationAreaTimer;
 
-        static readonly Lazy<SlackApi> SlackLazy = new Lazy<SlackApi>();
+        private DispatcherTimer UpdatesCheckTimer;
 
-        static ISlackApi Slack => SlackLazy.Value;
+        private static readonly Lazy<SlackApi> SlackLazy = new Lazy<SlackApi>();
+
+        private static ISlackApi Slack => SlackLazy.Value;
 
         private readonly Func<Message, Action> _addOrRemoveMessages;
 
-        private bool _hasAnyExceptions = false;
+        private bool _hasAnyExceptionsOnGetMessages = false;
+
+        private bool _hasAnyExceptionsOnClearMessages = false;
+
+        private DateTime NextCheckUpdatesAt;
 
         public MainWindow()
         {
@@ -35,7 +41,8 @@ namespace SlackDesktopBubbleApplication
                     this.NotificationArea);
 
             this.StackPanelControlls.Visibility = Visibility.Hidden;
-            //this.GridOpenMessageMenu.Visibility = Visibility.Hidden;
+            this.GridOpenMessageMenu.Visibility = Visibility.Hidden;
+            this.GridSendMessageArea.Visibility = Visibility.Hidden;
 
             this.MainIconArea.MouseDown += OnMouseDown;
             this.MainIconArea.MouseLeave += OnMouseLeave;
@@ -43,6 +50,38 @@ namespace SlackDesktopBubbleApplication
             this.ClearNotificationAreaTimer = new DispatcherTimer();
             this.ClearNotificationAreaTimer.Tick += ClearNotificationsTimerEventProcessor;
             this.ClearNotificationAreaTimer.Interval = new TimeSpan(0, 0, 5);
+
+            this.UpdatesCheckTimer = new DispatcherTimer();
+            this.UpdatesCheckTimer.Tick += UpdatesCheckTimerEventProcessor;
+            this.UpdatesCheckTimer.Interval = new TimeSpan(0, 0, 5);
+
+            this.NextCheckUpdatesAt = DateTime.Now;
+        }
+
+        private void UpdatesCheckTimerEventProcessor(object sender, EventArgs e)
+        {
+            if (this.NextCheckUpdatesAt >= DateTime.Now)
+            {
+                return;
+            }
+
+            bool hasUpdates = UpdateHelper.HasUpdates();
+            if (hasUpdates)
+            {
+                var updateAvailableResults = MessageBox.Show("New version available. Doswnload and update?", "Updates",
+                    MessageBoxButton.YesNoCancel);
+                if (updateAvailableResults == MessageBoxResult.Yes)
+                {
+                    Process.Start("Slack Bubble App Updater.exe");
+                    Process.GetCurrentProcess().Kill();
+                }
+
+                if (updateAvailableResults == MessageBoxResult.Cancel || updateAvailableResults == MessageBoxResult.No ||
+                    updateAvailableResults == MessageBoxResult.None)
+                {
+                    this.NextCheckUpdatesAt = DateTime.Now.AddHours(24);
+                }
+            }
         }
 
         //TODO: FIX HEIGHT
@@ -71,7 +110,7 @@ namespace SlackDesktopBubbleApplication
 
         internal void GetAndDisplayMessages(Func<Message, Action> action)
         {
-            while (!this._hasAnyExceptions)
+            while (!this._hasAnyExceptionsOnGetMessages)
             {
                 try
                 {
@@ -89,7 +128,7 @@ namespace SlackDesktopBubbleApplication
 
                     ExceptionLogging.Trace(ex);
 
-                    this._hasAnyExceptions = true;
+                    this._hasAnyExceptionsOnGetMessages = true;
 
                     this.ClearNotificationAreaTimer.Stop();
                 }
@@ -165,34 +204,45 @@ namespace SlackDesktopBubbleApplication
 
         private void ClearNotificationsTimerEventProcessor(object sender, EventArgs e)
         {
-            var elements =
-                this.NotificationArea.Children.Cast<object>()
-                    .Select(x => x as FrameworkElement)
-                    .Where(x => x != null)
-                    .ToList();
-
-            foreach (var element in elements)
+            try
             {
-                double messageTimestamp = Convert.ToInt32(element.Uid); //TODO: CAN NOT CONVERT 1481889334.00001
+                var elements =
+                    this.NotificationArea.Children.Cast<object>()
+                        .Select(x => x as FrameworkElement)
+                        .Where(x => x != null)
+                        .ToList();
 
-                var messageAddedAt = DateTimeUtility.UnixTimeStampToDateTime(messageTimestamp);
-
-                bool isSomething = messageAddedAt.AddSeconds(10) <= DateTime.Now;
-                if (isSomething)
+                foreach (var element in elements)
                 {
-                    for (int j = 0; j < 300; j++)
-                    {
-                        double value = 300 - j;
-                        element.Margin = new Thickness {Left = value};
-                    }
+                    double messageTimestamp = Convert.ToDouble(element.Uid); //TODO: CAN NOT CONVERT 1481889334.00001
 
-                    this.NotificationArea.Children.Remove(element);
+                    var messageAddedAt = DateTimeUtility.UnixTimeStampToDateTime(messageTimestamp);
+
+                    bool isSomething = messageAddedAt.AddSeconds(10) <= DateTime.Now;
+                    if (isSomething)
+                    {
+                        for (int j = 0; j < 300; j++)
+                        {
+                            double value = 300 - j;
+                            element.Margin = new Thickness {Left = value};
+                        }
+
+                        this.NotificationArea.Children.Remove(element);
+                    }
+                }
+
+                if (!elements.Any())
+                {
+                    this.UnSetColorsOnSlackSharpIcon();
                 }
             }
-
-            if (!elements.Any())
+            catch (Exception ex)
             {
-                this.UnSetColorsOnSlackSharpIcon();
+                ExceptionLogging.Trace(ex);
+
+                MessageHelper.AddMessage(this._addOrRemoveMessages, $"Error: {ex.Message}", "system");
+
+                this.ClearNotificationAreaTimer.Stop();
             }
         }
 
@@ -256,7 +306,7 @@ namespace SlackDesktopBubbleApplication
             {
                 if (e.ClickCount >= 2)
                 {
-                    this._hasAnyExceptions = false;
+                    this._hasAnyExceptionsOnGetMessages = false;
 
                     MessageHelper.AddMessage(this._addOrRemoveMessages, "Bubble has been restarted.", "system");
 
@@ -276,15 +326,15 @@ namespace SlackDesktopBubbleApplication
 
         private void TextBoxChannelGroupImName_KeyUp(object sender, KeyEventArgs e)
         {
-            var textBox = sender as TextBox;
+            //var textBox = sender as TextBox;
 
-            return;
+            //return;
 
-            string name = this.TextBoxChannelGroupImName.Text;
-            if (string.IsNullOrWhiteSpace(name) && name.Length < 3)
-            {
-                return;
-            }
+            //string name = this.TextBoxChannelGroupImName.Text;
+            //if (string.IsNullOrWhiteSpace(name) && name.Length < 3)
+            //{
+            //    return;
+            //}
 
             //string tempName = name;
 
@@ -293,21 +343,21 @@ namespace SlackDesktopBubbleApplication
             //    tempName = name.Replace("#", string.Empty).Replace("@", string.Empty);
             //}
 
-            var channelsNames = Slack.Components.Channels.Select(x => x.ChannelName).ToList();
+            //var channelsNames = Slack.Components.Channels.Select(x => x.ChannelName).ToList();
 
-            var channels =
-                channelsNames.Where(
-                    x => x.StartsWith(name, StringComparison.InvariantCultureIgnoreCase));
+            //var channels =
+            //    channelsNames.Where(
+            //        x => x.StartsWith(name, StringComparison.InvariantCultureIgnoreCase));
 
-            if (channels.Count() > 1)
-            {
-                return;
-            }
+            //if (channels.Count() > 1)
+            //{
+            //    return;
+            //}
 
-            if (channels.Count() == 1)
-            {
-                textBox.Text = $"#{channels.SingleOrDefault()}";
-            }
+            //if (channels.Count() == 1)
+            //{
+            //    textBox.Text = $"#{channels.SingleOrDefault()}";
+            //}
         }
 
         private void TextBoxChannelGroupImName_KeyDown(object sender, KeyEventArgs e)
@@ -329,7 +379,7 @@ namespace SlackDesktopBubbleApplication
 
         private void TextBoxMessageText_KeyUp(object sender, KeyEventArgs e)
         {
-            
+
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -346,6 +396,11 @@ namespace SlackDesktopBubbleApplication
                 thread.Start();
 
                 this.ClearNotificationAreaTimer?.Start();
+
+                if (!Slack.IsMock)
+                {
+                    this.UpdatesCheckTimer?.Start();
+                }
             }
             catch (Exception ex)
             {

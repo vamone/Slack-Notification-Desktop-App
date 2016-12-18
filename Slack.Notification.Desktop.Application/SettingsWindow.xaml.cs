@@ -1,9 +1,8 @@
-﻿using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
 using Slack.Intelligence;
 
-namespace SlackDesktopBubbleApplication
+namespace Slack.Desktop.Application
 {
     public partial class SettingsWindow : Window
     {
@@ -23,7 +22,7 @@ namespace SlackDesktopBubbleApplication
 
             RegistryUtility.Save("MyToken", token);
 
-            var window = WindowHelper.GetWindowByClassName<MainWindow>();
+            var window = WindowHelper.GetWindowByClassName<Slack.Desktop.Application.MainWindow>();
 
             bool isInitilized = window.IsSlackInitialized();
             if (isInitilized)

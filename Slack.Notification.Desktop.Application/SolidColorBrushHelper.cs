@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Media;
 
-namespace SlackDesktopBubbleApplication
+namespace Slack.Desktop.Application
 {
     public static class SolidColorBrushHelper
     {

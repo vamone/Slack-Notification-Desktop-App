@@ -7,7 +7,14 @@ namespace Slack.Api
 {
     public class MockSlackApi : ISlackApi
     {
+        public MockSlackApi()
+        {
+            this.IsMock = true;
+        }
+
         public Components Components { get; set; }
+
+        public bool IsMock { get; set; }
 
         public IEnumerable<Message> GetMessages()
         {

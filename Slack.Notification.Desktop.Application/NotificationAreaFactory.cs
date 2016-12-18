@@ -1,11 +1,11 @@
-﻿using System;
-using System.Globalization;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace SlackDesktopBubbleApplication
+using Slack.Intelligence;
+
+namespace Slack.Desktop.Application
 {
     public static class NotificationAreaFactory
     {

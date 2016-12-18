@@ -1,4 +1,4 @@
-﻿namespace SlackDesktopBubbleApplication
+﻿namespace Slack.Intelligence
 {
     public static class StringUtility
     {
