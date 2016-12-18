@@ -68,7 +68,7 @@ namespace Slack.Desktop.Application
             bool hasUpdates = UpdateHelper.HasUpdates();
             if (hasUpdates)
             {
-                var updateAvailableResults = MessageBox.Show("New version available. Doswnload and update?", "Updates",
+                var updateAvailableResults = MessageBox.Show("New version available. Download and update?", "Updates",
                     MessageBoxButton.YesNoCancel);
                 if (updateAvailableResults == MessageBoxResult.Yes)
                 {

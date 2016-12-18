@@ -162,3 +162,7 @@ Slack.Intelligens/obj/
 Slack.Notification.Console.Application/obj/
 Slack.Desktop.Application.Updater/obj/
 Slack.Desktop.Application.Updater/bin/
+Slack.Console.Application/bin/
+Slack.Desktop.Application/obj/
+Slack.Desktop.Application/bin/
+Slack.Console.Application/obj/
