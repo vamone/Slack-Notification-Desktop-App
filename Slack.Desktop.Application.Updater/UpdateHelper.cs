@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Reflection;
 
@@ -44,6 +45,8 @@ namespace Slack.Desktop.Application.Updater
                 using (var client = new WebClient())
                 {
                     client.DownloadFile(new Uri(url), fileName);
+
+                    File.SetAttributes(fileName, FileAttributes.Normal);
                 }
             }
             catch (Exception ex)
