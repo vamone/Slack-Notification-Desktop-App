@@ -68,8 +68,14 @@ namespace Slack.Desktop.Application
             bool hasUpdates = UpdateHelper.HasUpdates();
             if (hasUpdates)
             {
-                var updateAvailableResults = MessageBox.Show("New version available. Download and update?", "Updates",
+                var updateAvailableResults = UpdateAppMessageBoxWrapper.Show("New version available. Download and update?", "Updates",
                     MessageBoxButton.YesNoCancel);
+                if (updateAvailableResults == MessageBoxResult.None)
+                {
+                    this.NextCheckUpdatesAt = DateTime.Now.AddHours(24);
+                    return;
+                }
+
                 if (updateAvailableResults == MessageBoxResult.Yes)
                 {
                     Process.Start("Slack Bubble App Updater.exe");

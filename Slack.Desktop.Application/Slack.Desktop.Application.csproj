@@ -96,6 +96,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MessageBoxWrapper.cs" />
     <Compile Include="MessageHelper.cs" />
     <Compile Include="NotificationAreaFactory.cs" />
     <Compile Include="SettingsWindow.xaml.cs">
